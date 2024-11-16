@@ -70,6 +70,8 @@ When using Docker Compose, ensure the Nginx configuration specifies the service 
 
 Navigate to http://localhost in your browser to use the application. Nginx will route requests to the appropriate services.
 
+<br>
+
 ---
 
 If you have any questions or need assistance, feel free to open an issue on GitHub.
