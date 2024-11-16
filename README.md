@@ -3,6 +3,8 @@
 This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Flowbite, utilizing a Microservices Architecture.
 
 
+
+
 ### The application is composed of the following services:
 
 - Auth Service: Handles authentication and authorization.
@@ -11,11 +13,13 @@ This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Fl
 - Notification Service: Handles user notifications.
 
 
+
+
 ### How to Run the Application
 
 You can run this application either locally or using Docker Compose. Follow the instructions below for each approach:
 
-1. Running Locally
+1. #### Running Locally
 
 Clone the Repository:
 
