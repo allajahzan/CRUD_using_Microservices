@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  nginx:
+    build: ./nginx
+    container_name: crud_nginx
+    depends_on:
+      - web
+      - user
+      - admin
+      - auth
+    ports:
+      - '80:80'
+
+  web:
+    build: ./web
+    container_name: crud_web
+    ports:
+      - '5173:5173'
+
+  user:
+    build: ./services/user
+    container_name: crud_service_user
+    depends_on:
+      - rabbitmq
+    ports:
+      - '3000:80'
+
+  admin:
+    build: ./services/admin
+    container_name: crud_service_admin
+    ports:
+      - '3001:80'
+
+  auth:
+    build: ./services/auth
+    container_name: crud_service_auth
+    ports:
+      - '3002:80'
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    ports: 
+      - '5672:5672'   
+      - "15672:15672" 

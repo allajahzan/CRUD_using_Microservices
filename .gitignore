@@ -1,0 +1,18 @@
+# web
+web/.env
+
+# auth service
+services/auth/.env
+services/auth/node_modules
+
+# user servicecls
+services/user/.env
+services/user/node_modules
+
+# admin services
+services/admin/.env
+services/admin/node_modules
+
+# notification services
+services/notification/.env
+services/notification/node_modules
