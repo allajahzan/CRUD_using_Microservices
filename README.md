@@ -19,54 +19,67 @@ You can run this application either locally or using Docker Compose. Follow the 
 
 ### Running Locally
 
-1. Clone the Repository:
+<br>
 
+1. Clone the Repository:
 ```bash
 git clone https://github.com/your-repo-name.git
 cd your-repo-name
-Start Nginx:
 ```
+<br>
 
-2. Nginx must be containerized. Build and run the Nginx container:
+2. Start Nginx:
 ```bash
 docker build -t nginx-container ./nginx
 docker run -d -p 80:80 --name nginx-container nginx-container
 ```
-Ensure you set the service hostnames in the Nginx config file as host.docker.internal.
+<br>
 
+3. Change Hostnames in the Nginx config file as host.docker.internal.
+```bash
+server host.docker.internal:3000; 
+```
+<br>
 
-3. Run Each Service Locally:
+4. Run Each Service Locally:
 ```bash
 cd services/service-name
 npm run dev
 ```
+<br>
 
-
-4. Access the Application:
+5. Access the Application:
 Open your browser and navigate to the respective service endpoints.
 
-
+<br>
+<br>
 ---
-
+<br>
+<br>
 
 ### Running with Docker Compose
+
+<br>
 
 1. Clone the Repository:
 ```bash
 git clone https://github.com/your-repo-name.git
 cd your-repo-name
 ```
+<br>
 
 2. Start the Application:
 ```bash
 docker-compose up --build
 ```
+<br>
 
 3. Update Nginx Hostnames:
 
 When using Docker Compose, ensure the Nginx configuration specifies the service names which given in docker-compose.yaml file 
 (e.g., auth_service, user_service) as hostnames instead of host.docker.internal.
 
+<br>
 
 4. Access the Application:
 
