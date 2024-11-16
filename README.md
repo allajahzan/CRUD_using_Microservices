@@ -5,7 +5,7 @@ This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Fl
 
 
 
-### The application is composed of the following services:
+## The application is composed of the following services:
 
 - Auth Service: Handles authentication and authorization.
 - User Service: Manages user data and operations.
@@ -13,9 +13,11 @@ This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Fl
 - Notification Service: Handles user notifications.
 
 
-### How to Run the Application
+## How to Run the Application
 
 You can run this application either locally or using Docker Compose. Follow the instructions below for each approach:
+
+<br>
 
 ### Running Locally
 
@@ -49,15 +51,13 @@ npm run dev
 <br>
 
 5. Access the Application:
-Open your browser and navigate to the respective service endpoints.
 
-<br>
-<br>
+http://localhost:5173
+
+
 ---
-<br>
-<br>
 
-### Running with Docker Compose
+## Running with Docker Compose
 
 <br>
 
