@@ -12,6 +12,7 @@ This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Fl
 - Admin Service: Provides administrative functionalities such as user management.
 - Notification Service: Handles user notifications.
 
+<br>
 
 ## How to Run the Application
 
@@ -43,8 +44,6 @@ npm run dev
 ```
 
 5. Access the Application: http://localhost:5173
-
-<br>
 
 <br>
 
