@@ -2,7 +2,7 @@
 web/.env
 
 # nginx
-nginx
+nginx/
 
 # auth service
 services/auth/.env
