@@ -1,6 +1,9 @@
 # web
 web/.env
 
+# nginx
+nginx
+
 # auth service
 services/auth/.env
 services/auth/node_modules
