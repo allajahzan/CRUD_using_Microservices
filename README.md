@@ -17,11 +17,7 @@ This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Fl
 
 You can run this application either locally or using Docker Compose. Follow the instructions below for each approach:
 
-<br>
-
-### Running Locally
-
-<br>
+## A) Running Locally
 
 1. Clone the Repository:
 ```bash
@@ -57,9 +53,7 @@ http://localhost:5173
 
 ---
 
-## Running with Docker Compose
-
-<br>
+## B) Running with Docker Compose
 
 1. Clone the Repository:
 ```bash
