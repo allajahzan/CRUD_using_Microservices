@@ -2,14 +2,14 @@
 
 This is a CRUD application designed with React, TypeScript, Tailwind CSS, and Flowbite, utilizing a Microservices Architecture.
 
-## The application is composed of the following services:
+### The application is composed of the following services:
 
 - Auth Service: Handles authentication and authorization.
 - User Service: Manages user data and operations.
 - Admin Service: Provides administrative functionalities such as user management.
 - Notification Service: Handles user notifications.
 
-## How to Run the Application
+### How to Run the Application
 
 You can run this application either locally or using Docker Compose. Follow the instructions below for each approach:
 
