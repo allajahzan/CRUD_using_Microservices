@@ -42,13 +42,9 @@ cd services/service-name
 npm run dev
 ```
 
-5. Access the Application:
-
-http://localhost:5173
+5. Access the Application: http://localhost:5173
 
 <br>
-
----
 
 <br>
 
@@ -74,3 +70,9 @@ When using Docker Compose, ensure the Nginx configuration specifies the service 
 4. Access the Application:
 
 Navigate to http://localhost in your browser to use the application. Nginx will route requests to the appropriate services.
+
+---
+
+If you have any questions or need assistance, feel free to open an issue on GitHub.
+
+🚀 Thank you!
