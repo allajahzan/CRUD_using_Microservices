@@ -96,3 +96,17 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
+// get Admin
+export const getAdmin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { userId } = req.body.payload
+        const user = await User.findOne({ userId })
+        if (!user) return res.status(404).json({ msg: "User not found" })
+
+        res.status(200).json({ userData: user })
+
+    } catch (err) {
+        next(err)
+    }
+}
+

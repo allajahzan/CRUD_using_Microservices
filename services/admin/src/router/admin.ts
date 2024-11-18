@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { refreshToken, server, verifyToken} from "../controller/admin";
+import { refreshToken, server, verifyToken, getAdmin } from "../controller/admin";
 import { authentication } from "../middleware/authentication";
 const router = Router()
 
@@ -11,6 +11,9 @@ router.get('/verifyToken', verifyToken)
 
 // refresh token 
 router.get('/refreshToken', refreshToken)
+
+// get admin
+router.get('/getAdmin', authentication, getAdmin)
 
 
 
