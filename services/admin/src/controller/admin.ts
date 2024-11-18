@@ -38,3 +38,61 @@ export const server = async (req: Request, res: Response) => {
     res.send("server is runnning on port 3002 - admin service")
 }
 
+// admin verify token
+export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // no storing in cache becuase of GET method
+        res.setHeader('Cache-Control', 'no-store');
+
+        const accessToken = req.headers['authorization']?.split(' ')[1]
+        if (!accessToken) return res.status(403).json({ msg: "Unauthorized access" })
+
+        // jwt verification 
+        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string, async (err: jwt.VerifyErrors | null, payload: string | jwt.JwtPayload | undefined) => {
+            if (err) return res.status(403).json({ msg: "Unauthorized access" })
+            else {
+                // check weather admin is existing or not in admin service db
+                const isAdmin = await User.findOne({ userId: (payload as jwt.JwtPayload).userId })
+                if (!isAdmin) return res.status(404).json({ msg: 'Admin not found' })
+
+                console.log("access token verified")
+                return res.status(200).json({ msg: "Authorized access" })
+            }
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+// admin refresh token
+export const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // no storing in cache becuase of GET method
+        res.setHeader('Cache-Control', 'no-store');
+
+        const refreshToken = req.cookies.adminRefreshToken
+
+        if (!refreshToken) {
+            return res.status(403).json({ msg: "Unauthorized access" })
+        }
+
+        // jwt token verification
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: jwt.VerifyErrors | null, payload: string | jwt.JwtPayload | undefined) => {
+            if (err) {
+                res.clearCookie('refreshToken')
+                return res.status(403).json({ msg: "Unauthorized access" })
+            } else {
+                //checking weather admin is existing or not in admin service db
+                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId })
+                if (!isUser) return res.status(404).json({ msg: "User not found" })
+
+                console.log("refresh token verified")
+                const newAccessToken = jwt.sign({ userId: (payload as JwtPayload).userId }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '1m' })
+                return res.status(200).json({ newAccessToken })
+            }
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
