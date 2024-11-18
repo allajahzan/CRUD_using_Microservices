@@ -110,3 +110,13 @@ export const getAdmin = async (req: Request, res: Response, next: NextFunction):
     }
 }
 
+// get users
+export const getUsers = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const users = await User.find({ isAdmin: false })
+        res.status(200).json({ users })
+    } catch (err) {
+        next(err)
+    }
+}
+
