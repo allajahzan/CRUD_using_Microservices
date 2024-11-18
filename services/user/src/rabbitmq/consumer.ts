@@ -1,13 +1,13 @@
 import amqp from 'amqplib'
 import User from '../schema/user';
-import { userType } from '../schema/user';
 
 // get new user created from auth service
-export const getNewUserCreatedFromAuthService = (channel: amqp.Channel, connection: amqp.Connection) => {
+export const getNewUserCreatedFromAuthService = (channel: amqp.Channel) => {
     try {
         const exchange = 'user.signup'
         const queue = 'USER_CREATED_USER_SERVICE'
 
+        // assert exchange and queue
         channel.assertExchange(exchange, 'fanout', { durable: true })
         channel.assertQueue(queue, { durable: true })
 
@@ -16,8 +16,8 @@ export const getNewUserCreatedFromAuthService = (channel: amqp.Channel, connecti
 
         // consume message from queue
         channel.consume(queue, async (data: any) => {
-            const user: userType = JSON.parse(data.content)
-            const newUser = new User({ name: user.name, email: user.email, image: user.image })
+            const user = JSON.parse(data.content)
+            const newUser = new User({ userId: user._id, name: user.name, email: user.email, image: user.image, isAdmin : user.isAdmin })
             await newUser.save()
 
             // acknowledge the queue

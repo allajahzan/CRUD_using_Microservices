@@ -1,6 +1,14 @@
 import { model, Schema } from "mongoose";
 
-const userSchema = new Schema({
+export interface userType {
+    name: string,
+    email: string,
+    password: string,
+    image: string,
+    isAdmin: Boolean,
+}
+
+const userSchema = new Schema<userType>({
     name: {
         type: String,
         required: true
@@ -17,11 +25,11 @@ const userSchema = new Schema({
         type: String,
         required: false
     },
-    isAdmin : {
-        type : Boolean,
+    isAdmin: {
+        type: Boolean,
         default: false
     }
 }, { timestamps: true })
 
-const User = model('User', userSchema)
+const User = model<userType>('User', userSchema)
 export default User

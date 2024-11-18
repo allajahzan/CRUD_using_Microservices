@@ -30,7 +30,7 @@ function Users() {
                     dispathFun(SetAdminToken(newAccessToken))
                     Cookies.set('adminAccessToken', newAccessToken)
 
-                    fetch(`http://localhost:3000/admin/deleteUser?userId=${userId}`,
+                    fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/deleteUser/${userId}`,
                         {
                             method: 'DELETE',
                             headers: {
@@ -62,7 +62,7 @@ function Users() {
                         dispathFun(SetAdminToken(newAccessToken))
                         Cookies.set('adminAccessToken', newAccessToken)
 
-                        fetch('http://localhost:3000/admin/getUsers', {
+                        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/getUsers`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${newAccessToken}`
@@ -70,9 +70,12 @@ function Users() {
                         })
                             .then(async (res) => {
                                 const data = await res.json()
-                                if (res.status === 401) {
+                                if (res.status === 403) {
                                     getUsers()
-                                } else {
+                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
+                                    adminContext?.logout()
+                                }
+                                else {
                                     setUsers(data.users)
                                 }
                             })
@@ -181,7 +184,7 @@ function Users() {
 
             {!users &&
                 <div className="flex justify-center items-center ">
-                    <img className="w-12 animate-spin" src={loading} alt="" />
+                    <img className="w-10 animate-spin" src={loading} alt="" />
                 </div>
             }
 

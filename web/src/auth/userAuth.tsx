@@ -10,14 +10,14 @@ const isTokenExpired = (token: string) => {
 // refresh access token
 async function refreshAccessToken() {
     try {
-        const resp = await fetch('http://localhost/user/refreshToken', {
+        const res = await fetch('http://localhost/user/refreshToken', {
             method: 'GET',
             credentials: 'include'
         });
-        if (resp.status === 403) {
+        if (res.status === 403 || res.status === 404 || res.status === 501 || res.status === 502) {
             return null
         } else {
-            const data = await resp.json()
+            const data = await res.json()
             return data.newAccessToken
         }
     }
@@ -43,6 +43,8 @@ export const verifyToken = (accessToken: string) => fetch(`${import.meta.env.VIT
             } else {
                 return null
             }
+        } else if (res.status === 404 || res.status === 501 || res.status === 502) {
+            return null
         }
         return accessToken
     })

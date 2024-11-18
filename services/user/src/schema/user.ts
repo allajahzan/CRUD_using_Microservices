@@ -1,12 +1,18 @@
 import { model, Schema } from "mongoose";
 
 export interface userType {
+    userId: string,
     name: string,
     email: string,
-    image: string
+    image: string,
+    isAdmin: Boolean
 }
 
 const userSchema = new Schema<userType>({
+    userId: {
+        type: String,
+        required: true
+    },
     name: {
         type: String,
         required: true
@@ -19,6 +25,10 @@ const userSchema = new Schema<userType>({
         type: String,
         required: false
     },
+    isAdmin: {
+        type: Boolean,
+        require: true
+    }
 }, { timestamps: true })
 
 const User = model<userType>('User', userSchema)

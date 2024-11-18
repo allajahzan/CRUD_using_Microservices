@@ -4,8 +4,6 @@ import dotenv from "dotenv";
 import route from "./router/auth";
 import morgan from "morgan";
 import { connect } from './controller/auth'
-import { grpcServer_userService } from "./gRPC/userService";
-import { grpcServer_adminService } from "./gRPC/adminService";
 import { errorHandle } from "./middleware/error.handle";
 
 // create app
@@ -31,10 +29,6 @@ app.use("/", route);
 
 // error logger
 app.use(errorHandle);
-
-// gRPC Servers
-grpcServer_userService();
-grpcServer_adminService();
 
 // server listening
 app.listen(process.env.PORT, () => {

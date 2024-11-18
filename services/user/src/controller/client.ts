@@ -11,6 +11,7 @@ export async function connect() {
     let retries = 5;
     while (retries) {
         try {
+            // rabbitmq connection and channel
             connection = await amqp.connect(amqpServer);
             channel = await connection.createChannel();
             console.log("Connected to RabbitMQ");
@@ -18,7 +19,7 @@ export async function connect() {
             // message from auth service------------------------
 
             // user.signup
-            getNewUserCreatedFromAuthService(channel, connection)
+            getNewUserCreatedFromAuthService(channel)
 
             break;
         } catch (err) {
@@ -37,7 +38,7 @@ export const server = async (req: Request, res: Response) => {
 // verify access token
 export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        // clear cache 
+        // no storing in cache becuase of GET method
         res.setHeader('Cache-Control', 'no-store');
 
         const accessToken = req.headers["authorization"]?.split(' ')[1]
@@ -48,11 +49,11 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
             if (err) return res.status(403).json({ msg: 'Unauthorized access' })
             else {
                 //checking weather user is existing or not in user service db
-                const isUser = await User.findOne({ email: (payload as JwtPayload).email })
+                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId })
                 if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("access token verified")
-                return res.status(200).json({ msg: "Authorized" })
+                return res.status(200).json({ msg: "Authorized access" })
             }
         })
     } catch (err) {
@@ -63,7 +64,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 // refresh accesss token
 export const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        // clear cache 
+        // no storing in cache becuase of GET method
         res.setHeader('Cache-Control', 'no-store');
 
         const refreshToken = req.cookies.refreshToken
@@ -78,7 +79,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
                 return res.status(403).json({ msg: "Unauthorized access" })
             } else {
                 //checking weather user is existing or not in user service db
-                const isUser = await User.findOne({ email: (payload as JwtPayload).email })
+                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId })
                 if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("refresh token verified")
@@ -94,9 +95,9 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 // get user
 export const getUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { email } = req.body.payload
+        const { userId } = req.body.payload
 
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ userId: userId })
         if (!user) return res.status(404).json({ msg: "User not found" })
 
         res.status(200).json({ userData: user })
@@ -111,10 +112,21 @@ export const editUser = async (req: Request, res: Response, next: NextFunction):
     try {
         const { payload, name, email, image } = req.body
 
-        const user = await User.findOne({ email: payload.email })
+        const user = await User.findOne({ userId: payload.userId })
         if (!user) return res.status(404).json({ msg: "User not found" })
 
+        user.name = name
+        user.email = email
+        user.image = image
+        const updatedUser = await user.save()
 
+        // send message to exhange in rabbitmq
+        const exhange = 'user.update'
+        channel.assertExchange(exhange, 'fanout', { durable: true })
+        channel.publish(exhange, '', Buffer.from(JSON.stringify({ updatedUser, payload })))
+        console.log("send message to exhange")
+
+        res.status(200).json({ msg: "User data updated" })
 
     } catch (err: any) {
         next(err.message)

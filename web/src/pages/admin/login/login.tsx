@@ -38,12 +38,12 @@ function Login() {
         }
 
         setLogin(true)
-        fetch('http://localhost/auth/admin/login', {
+        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/auth/admin/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials : 'include',
+            credentials: 'include',
             body: JSON.stringify(obj)
         })
             .then(async (res) => {

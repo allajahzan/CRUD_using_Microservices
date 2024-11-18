@@ -1,10 +1,10 @@
 import express from 'express'
-import routes from './router/user'
+import routes from './router/client'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
-import { connect } from './rabbitmq/consumer'
+import { connect } from './controller/client'
 import { errorHandler } from './middleware/error.handle'
 
 // create app

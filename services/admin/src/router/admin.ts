@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { server, verifyToken } from "../controller/admin";
+import { server } from "../controller/admin";
+import { authentication } from "../middleware/authentication";
 const router = Router()
 
 // get server
 router.get('/', server)
 
-// verify token
-router.get('/verifyToken', verifyToken)
 
 export default router

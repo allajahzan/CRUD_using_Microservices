@@ -36,7 +36,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                     .then(async (res) => {
                         if (res.status === 403) {
                             checkUserAuth()
-                        } else if (res.status === 404 || res.status === 501) {
+                        } else if (res.status === 404 || res.status === 501 || res.status === 502) {
                             logout()
                         }
                         else {

@@ -28,7 +28,7 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
                         disaptchFun(SetAdminToken(newAccessToken))
                         Cookies.set('adminAccessToken', newAccessToken)
 
-                        fetch('http://localhost/admin/getAdmin', {
+                        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/getAdmin`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${newAccessToken}`
@@ -37,17 +37,16 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
                             .then(async (res) => {
                                 if (res.status === 403) {
                                     checkAdminAuth()
-                                } else if (res.status === 404 || res.status === 501) {
+                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
                                     logout()
                                 } else {
                                     const data = await res.json()
-                                    disaptchFun(UpdateAdmin(data.admin))
+                                    disaptchFun(UpdateAdmin(data.userData))
                                 }
                             })
                             .catch((err) => {
                                 console.log(err)
                             })
-
                     } else {
                         logout()
                     }
@@ -63,10 +62,18 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
 
     // logout
     const logout = () => {
-        disaptchFun(SetAdminToken(null))
-        disaptchFun(UpdateAdmin(null))
-        Cookies.remove('adminAccessToken')
-        setAuth(false)
+        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/auth/admin/logout`, { credentials: 'include' })
+            .then((res) => {
+                if (res.ok) {
+                    disaptchFun(SetAdminToken(null))
+                    disaptchFun(UpdateAdmin(null))
+                    Cookies.remove('adminAccessToken')
+                    setAuth(false)
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     }
 
     return (

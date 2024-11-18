@@ -2,7 +2,9 @@ import express from "express";
 import route from './router/admin'
 import dotenv from 'dotenv'
 import mongoose from "mongoose";
-import { connect } from "./rabbitmq/consumer";
+import morgan from 'morgan'
+import cookiesParser from 'cookie-parser'
+import { connect } from "./controller/admin";
 import { errorHandler } from "./middleware/error.handle";
 
 // create app
@@ -18,6 +20,12 @@ mongoose.connect(process.env.MONGO_URL as string)
 
 // rabbitmq connection
 connect()
+
+// middlewares
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use(cookiesParser())
+app.use(morgan('dev'))
 
 // route middleware
 app.use('/', route)

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { server, editUser, verifyToken, refreshToken, getUser } from '../controller/user'
+import { server, editUser, verifyToken, refreshToken, getUser } from '../controller/client'
 import { authentication } from '../middleware/authentication'
 import multer from 'multer'
 const router = Router()

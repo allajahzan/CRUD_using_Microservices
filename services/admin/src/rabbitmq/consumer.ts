@@ -1,46 +1,23 @@
 import amqp from 'amqplib'
 import User, { userType } from '../schema/user';
 
-let connection: amqp.Connection, channel: amqp.Channel;
-export async function connect() {
-    const amqpServer = 'amqp://localhost:5672';
-    let retries = 5
-    while (retries) {
-        try {
-            connection = await amqp.connect(amqpServer)
-            channel = await connection.createChannel()
-            console.log("connected to RabbitMQ")
-
-            // messages from auth service
-
-            // user.signup
-            getNewUserCreatedFromAuthService(channel, connection)
-
-            break;
-        } catch (err) {
-            console.log("Failed to connect to RabbitMQ. Retrying in 5 seconds", err);
-            retries -= 1;
-            await new Promise(res => setTimeout(res, 5000));
-        }
-    }
-}
-
-
 // get new user from auth service
-function getNewUserCreatedFromAuthService(channel: amqp.Channel, connection: amqp.Connection) {
+export const getNewUserCreatedFromAuthService = (channel: amqp.Channel) => {
     try {
         const exchange = 'user.signup'
         const queue = 'USER_CREATED_ADMIN_SERVICE'
 
+        // assert exchange and queue
         channel.assertExchange(exchange, 'fanout', { durable: true })
         channel.assertQueue(queue, { durable: true })
 
-        // bind queue to exhange
+        // bind queue to exchange
         channel.bindQueue(queue, exchange, '')
 
+        // consume message from queue
         channel.consume(queue, async (data: any) => {
-            const user: userType = JSON.parse(data.content)
-            const newUser = new User({ name: user.name, email: user.email, image: user.image })
+            const user = JSON.parse(data.content)
+            const newUser = new User({ userId: user._id, name: user.name, email: user.email, image: user.image, isAdmin : user.isAdmin })
             await newUser.save()
 
             // acknowledge the queue
@@ -51,4 +28,39 @@ function getNewUserCreatedFromAuthService(channel: amqp.Channel, connection: amq
     } catch (err) {
         console.log(err)
     }
-} 
+}
+
+// get updated user from user service
+export const getUpdatedUserFromUserService = async (channel: amqp.Channel) => {
+    const exhange = 'user.update'
+    const queue = 'USER_UPDATED_ADMIN_SERVICE'
+
+    // assert exchange and queue
+    channel.assertExchange(exhange, 'fanout', { durable: true })
+    channel.assertQueue(queue, { durable: true })
+
+    // bind queue to exchange
+    channel.bindQueue(queue, exhange, '')
+
+    // consume message from queue
+    channel.consume(queue, async (data: any) => {
+        const message = JSON.parse(data.content)
+        const updatedUser: userType = message.updatedUser
+        const user = await User.findOne({userId : updatedUser.userId})
+        if (!user) {
+            // acknowledge the queue
+            channel.ack(data)
+            console.log("User not found")
+            return
+        }
+
+        user.name = updatedUser.name
+        user.email = updatedUser.email
+        user.image = updatedUser.image
+        await user.save()
+
+        // acknowledge the queue
+        channel.ack(data)
+        console.log('user data updated in db')
+    })
+}

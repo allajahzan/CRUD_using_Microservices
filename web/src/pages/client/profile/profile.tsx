@@ -73,7 +73,7 @@ function Profile() {
                                 const data = await res.json()
                                 if (res.status === 403) {
                                     updateUser()
-                                } else if (res.status === 404) {
+                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
                                     userContext?.logout()
                                 } else if (res.status === 409) {
                                     setUpdate(false)

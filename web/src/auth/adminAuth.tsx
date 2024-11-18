@@ -1,5 +1,4 @@
 import { jwtDecode } from "jwt-decode"
-import Cookies from "js-cookie"
 
 // check weather token expired or not
 const isTokenExpired = (token: string) => {
@@ -10,32 +9,26 @@ const isTokenExpired = (token: string) => {
 
 // refresh access token
 async function refreshAccessToken() {
-    if (Cookies.get('adminRefreshToken')) {
-        try {
-            const resp = await fetch('http://localhost/admin/refreshToken', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${Cookies.get('adminRefreshToken')}`
-                }
-            });
-            if(resp.status === 401) {
-                return null
-            } else {
-                const data = await resp.json()
-                return data.newAccessToken
-            }
-        }
-        catch (err) {
-            console.log(err)
+    try {
+        const res = await fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/refreshToken`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (res.status === 403 || res.status === 404 || res.status === 501 || res.status === 502) {
             return null
+        } else {
+            const data = await res.json()
+            return data.newAccessToken
         }
-    } else {
+    }
+    catch (err) {
+        console.log(err)
         return null
     }
 }
 
 // verify access token
-export const verifyToken = (accessToken: string) => fetch('http://localhost/admin/verifyToken', {
+export const verifyToken = (accessToken: string) => fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/verifyToken`, {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',
@@ -43,13 +36,15 @@ export const verifyToken = (accessToken: string) => fetch('http://localhost/admi
     },
 })
     .then(async (res) => {
-        if (res.status === 401) {
+        if (res.status === 403) {
             const newAccessToken = await refreshAccessToken()
             if (newAccessToken) {
                 return newAccessToken
             } else {
                 return null
             }
+        } else if (res.status === 404 || res.status === 501 || res.status === 502) {
+            return null
         }
         return accessToken
     })
