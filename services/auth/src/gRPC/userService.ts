@@ -1,10 +1,10 @@
 import * as grpc from '@grpc/grpc-js'
 import * as protoloader from '@grpc/proto-loader'
 import path from 'path'
-import User from './schema/user'
+import User from '../schema/user'
 
 const packageDefinition = protoloader.loadSync(
-    path.join(__dirname, 'user.proto')
+    path.join(__dirname, '..', '/proto/user.proto')
 )
 
 const userProto = grpc.loadPackageDefinition(packageDefinition).user
@@ -50,10 +50,10 @@ const updateUser = async (call: any, callback: any) => {
     }
 }
 
-export const grpcServer = () => {
+export const grpcServer_userService = () => {
     const server = new grpc.Server();
     server.addService((userProto as any).UserService.service, { getUser, updateUser });
     server.bindAsync('localhost:50051', grpc.ServerCredentials.createInsecure(), () => {
-        console.log('Auth gRPC server running on port 50051');
+        console.log('Auth gRPC server for user service running on port 50051');
     });
 }

@@ -2,7 +2,27 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../schema/user'
+import amqp from 'amqplib'
 
+// rabbitmq connection
+let connection: amqp.Connection, channel : amqp.Channel;
+async function connect() {
+  const amqpServer = 'amqp://localhost:5672'
+  let retries = 5
+  while (retries) {
+    try {
+      connection = await amqp.connect(amqpServer)
+      channel = await connection.createChannel()
+      console.log("connected to rabbitMQ")
+      break;
+    } catch (err) {
+      console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds...", err);
+      retries -= 1;
+      await new Promise(res => setTimeout(res, 5000));
+    }
+  }
+}
+connect()
 
 // server
 export const server = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -22,6 +42,10 @@ export const userSignup = async (req: Request, res: Response, next: NextFunction
 
         const newUser = new User({ name, email, password: hashedPassword })
         await newUser.save()
+
+        channel.assertQueue('USER-DATA-TO-USER-SERVICE', {durable : true})
+        channel.sendToQueue('USER-DATA-TO-USER-SERVICE', Buffer.from(JSON.stringify(newUser)))
+        console.log("send to USER-DATA-TO-USER-SERVICE queue")
 
         return res.status(200).json({ msg: "Successfully created an account" })
 
@@ -104,3 +128,4 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
         console.log(err)
     }
 }
+

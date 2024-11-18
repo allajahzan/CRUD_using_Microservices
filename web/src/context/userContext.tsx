@@ -54,6 +54,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
         checkUserAuth()
 
+
     }, [isAuth])
 
     //logout
@@ -65,9 +66,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                     disaptchFun(UpdateUser(null))
                     Cookies.remove('accessToken')
                     setAuth(false)
-                } else {
-                    alert("failed to logout")
-                }
+                } 
             })
             .catch((err) => {
                 console.log(err)

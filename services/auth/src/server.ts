@@ -3,7 +3,8 @@ import mongose from "mongoose";
 import dotenv from "dotenv";
 import route from "./router/auth";
 import morgan from "morgan";
-import { grpcServer } from "./grpcServer";
+import { grpcServer_userService } from "./gRPC/userService";
+import { grpcServer_adminService } from "./gRPC/adminService";
 import { errorHandle } from "./middleware/error.handle";
 
 // create app
@@ -32,8 +33,9 @@ app.use("/", route);
 // error logger
 app.use(errorHandle);
 
-// gRPC Server
-grpcServer();
+// gRPC Servers
+grpcServer_userService();
+grpcServer_adminService();
 
 // server listening
 app.listen(process.env.PORT, () => {
