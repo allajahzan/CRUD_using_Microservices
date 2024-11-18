@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../schema/user'
 import amqp from 'amqplib'
-import { getUpdatedUserFromUserService } from '../rabbitmq/consumer'
+import { deleteUserFromAdminService, getUpdatedUserFromUserService } from '../rabbitmq/consumer'
 
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
@@ -17,10 +17,15 @@ export async function connect() {
             channel = await connection.createChannel()
             console.log("connected to rabbitMQ")
 
-            // messages from user service
+            // messages from user service----------------------
 
             // user.update
             getUpdatedUserFromUserService(channel)
+
+            // message from admin service----------------------
+
+            // user.delete.admin
+            deleteUserFromAdminService(channel)
 
             break;
         } catch (err) {

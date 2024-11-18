@@ -35,3 +35,31 @@ export const getUpdatedUserFromUserService = async (channel: amqp.Channel) => {
         console.log('user data updated in db')
     })
 }
+
+// get userId to delete user from admin service
+export const deleteUserFromAdminService = (channel: amqp.Channel) => {
+    try {
+        const exhange = 'user.delete.admin'
+        const queue = 'USER_DELETED_AUTH_SERVICE'
+
+        // assert exchange and queue
+        channel.assertExchange(exhange, 'fanout', { durable: true })
+        channel.assertQueue(queue, { durable: true })
+
+        // bind queue to exchange
+        channel.bindQueue(queue, exhange, '')
+
+        // consume message from queue
+        channel.consume(queue, async (data: any) => {
+            const message = JSON.parse(data.content)
+            const userId = message.userId
+            await User.deleteOne({ userId: userId })
+
+            // acknowledge the queue
+            channel.ack(data)
+            console.log("user data deleted from db")
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}

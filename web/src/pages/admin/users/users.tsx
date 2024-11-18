@@ -38,12 +38,17 @@ function Users() {
                             }
                         })
                         .then(async (res) => {
-                            return await res.json()
-                        })
-                        .then((data) => {
-                            alert(data.msg)
-                            const newUsers = (users as object[]).filter((user) => (user as any)._id !== userId)
-                            setUsers(newUsers)
+                            const data = await res.json()
+                            if (res.status === 403) {
+                                handleDelete(userId)
+                            } else if (res.status === 404 || res.status === 501 || res.status === 502) {
+                                adminContext?.logout()
+                            } else if (res.status === 410) {
+                                alert(data.msg)
+                            } else {
+                                const newUsers = (users as object[]).filter((user) => (user as any).userId !== userId)
+                                setUsers(newUsers)
+                            }
                         })
                         .catch((err) => {
                             console.log(err)
@@ -165,7 +170,7 @@ function Users() {
                                         </Link>
                                     </Table.Cell>
                                     <Table.Cell className="p-0">
-                                        <img className="w-6 cursor-pointer" onClick={() => handleDelete(item._id)} src={deleteIcon} alt="" />
+                                        <img className="w-6 cursor-pointer" onClick={() => handleDelete(item.userId)} src={deleteIcon} alt="" />
                                     </Table.Cell>
                                 </Table.Row>
                             })}

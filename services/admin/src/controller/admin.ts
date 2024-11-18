@@ -120,3 +120,24 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction):
     }
 }
 
+// delete user
+export const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const userId = req.params.userId
+        const user = await User.findOne({ userId: userId })
+        if (!user) return res.status(410).json({ msg: 'no such user found' })
+
+        await User.deleteOne({ userId: userId })
+
+        // send message to exchange in rabbit mq
+        const exchange = 'user.delete.admin'
+        channel.assertExchange(exchange, 'fanout', { durable: true })
+        channel.publish(exchange, '', Buffer.from(JSON.stringify({ userId: userId })))
+        console.log('send message to exchange')
+
+        res.status(200).json({ msg: "user data deleted" })
+    } catch (err) {
+        console.log(err)
+    }
+}
+

@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { refreshToken, server, verifyToken, getAdmin, getUsers } from "../controller/admin";
+import multer from 'multer'
+import { refreshToken, server, verifyToken, getAdmin, getUsers, deleteUser } from "../controller/admin";
 import { authentication } from "../middleware/authentication";
 const router = Router()
+const upload = multer()
 
 // get server
 router.get('/', server)
@@ -18,6 +20,8 @@ router.get('/getAdmin', authentication, getAdmin)
 // get users
 router.get('/getUsers', authentication, getUsers)
 
+// delete user
+router.delete('/deleteUser/:userId', deleteUser)
 
 
 export default router

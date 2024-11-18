@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import amqp from 'amqplib'
-import { getNewUserCreatedFromAuthService } from "../rabbitmq/consumer"
+import { deleteUserFromAdminService, getNewUserCreatedFromAuthService } from "../rabbitmq/consumer"
 import User from "../schema/user"
 
 // rabit mq connection
@@ -20,6 +20,11 @@ export async function connect() {
 
             // user.signup
             getNewUserCreatedFromAuthService(channel)
+
+            // message from admin service----------------------
+            
+            // user.delete.admin
+            deleteUserFromAdminService(channel)
 
             break;
         } catch (err) {
