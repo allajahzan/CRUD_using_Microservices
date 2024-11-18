@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
+import { connect } from './rabbitmq/consumer'
 import { errorHandler } from './middleware/error.handle'
 
 // create app
@@ -17,10 +18,12 @@ mongoose.connect(process.env.MONGO_URL as string)
     .then((res) => console.log("successfully connected to client service db"))
     .catch((err) => console.log("failed to connect to client service db"))
 
+// rabbitmq connection
+connect()
 
 // middlewares
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 app.use(cookieParser())
 

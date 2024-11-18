@@ -6,7 +6,7 @@ import amqp from 'amqplib'
 
 // rabbitmq connection
 let connection: amqp.Connection, channel : amqp.Channel;
-async function connect() {
+export async function connect() {
   const amqpServer = 'amqp://localhost:5672'
   let retries = 5
   while (retries) {
@@ -16,13 +16,12 @@ async function connect() {
       console.log("connected to rabbitMQ")
       break;
     } catch (err) {
-      console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds...", err);
+      console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds", err);
       retries -= 1;
       await new Promise(res => setTimeout(res, 5000));
     }
   }
 }
-connect()
 
 // server
 export const server = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -43,9 +42,10 @@ export const userSignup = async (req: Request, res: Response, next: NextFunction
         const newUser = new User({ name, email, password: hashedPassword })
         await newUser.save()
 
-        channel.assertQueue('USER-DATA-TO-USER-SERVICE', {durable : true})
-        channel.sendToQueue('USER-DATA-TO-USER-SERVICE', Buffer.from(JSON.stringify(newUser)))
-        console.log("send to USER-DATA-TO-USER-SERVICE queue")
+        const exchange = 'user.signup'
+        channel.assertExchange(exchange, 'fanout',{durable:true})
+        channel.publish(exchange, '', Buffer.from(JSON.stringify(newUser)))
+        console.log("send message to exchange")
 
         return res.status(200).json({ msg: "Successfully created an account" })
 
@@ -65,7 +65,7 @@ export const userLogin = async (req: Request, res: Response, next: NextFunction)
         const isPasswordValid = await bcrypt.compare(password, isUser.password)
         if (!isPasswordValid) return res.status(401).json({ msg: "Incorrect password" })
 
-        const payload = { userId: isUser._id }
+        const payload = { userId: isUser._id, email: email }
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '7d' })
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '1m' })
 

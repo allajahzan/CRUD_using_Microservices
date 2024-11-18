@@ -1,15 +1,17 @@
 import { model, Schema } from "mongoose";
 
-const userSchema = new Schema({
+export interface userType {
+    name: string,
+    email: string,
+    image: string
+}
+
+const userSchema = new Schema<userType>({
     name: {
         type: String,
         required: true
     },
     email: {
-        type: String,
-        required: true
-    },
-    password: {
         type: String,
         required: true
     },
@@ -19,5 +21,5 @@ const userSchema = new Schema({
     },
 }, { timestamps: true })
 
-const User = model('User', userSchema)
+const User = model<userType>('User', userSchema)
 export default User

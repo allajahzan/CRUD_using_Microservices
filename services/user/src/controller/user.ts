@@ -1,37 +1,33 @@
 import { Request, Response, NextFunction } from "express"
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import amqp from 'amqplib'
-import { getUserFromAuthService, updateUserFromAuthService } from "../grpcConnection"
+import { getNewUserCreatedFromAuthService } from "../rabbitmq/consumer"
+import User from "../schema/user"
 
 // rabit mq connection
-let connection, channel
-async function connect() {
+let connection: amqp.Connection, channel: amqp.Channel;
+export async function connect() {
     const amqpServer = 'amqp://localhost:5672';
     let retries = 5;
     while (retries) {
         try {
             connection = await amqp.connect(amqpServer);
             channel = await connection.createChannel();
-            await channel.assertQueue('USERS');
             console.log("Connected to RabbitMQ");
 
-            // here we will consume the message then
-            channel.assertQueue('USER-DATA-TO-USER-SERVICE', { durable: true })
-            channel.consume('USER-DATA-TO-USER-SERVICE', (data: any) => {
-                let newUser = JSON.parse(data?.content)
-                console.log(newUser)
-                console.log("consumed")
-            })
+            // message from auth service------------------------
+
+            // user.signup
+            getNewUserCreatedFromAuthService(channel, connection)
 
             break;
         } catch (err) {
-            console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds...", err);
+            console.log("Failed to connect to RabbitMQ. Retrying in 5 seconds", err);
             retries -= 1;
             await new Promise(res => setTimeout(res, 5000));
         }
     }
 }
-connect()
 
 // server 
 export const server = async (req: Request, res: Response) => {
@@ -41,18 +37,19 @@ export const server = async (req: Request, res: Response) => {
 // verify access token
 export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        // clear cache 
         res.setHeader('Cache-Control', 'no-store');
 
         const accessToken = req.headers["authorization"]?.split(' ')[1]
         if (!accessToken) return res.status(403).json({ msg: 'Unauthorized access' })
 
+        // jwt token verification  
         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string, async (err: jwt.VerifyErrors | null, payload: string | jwt.JwtPayload | undefined) => {
             if (err) return res.status(403).json({ msg: 'Unauthorized access' })
             else {
-                //checking weather user is existing or not - through gRPC                
-                const response = await getUserFromAuthService((payload as JwtPayload).userId)
-                if (response.status === 404) return res.status(response.status).json({ msg: response.msg })
-                else if (response.status === 501) return next(response.msg)
+                //checking weather user is existing or not in user service db
+                const isUser = await User.findOne({ email: (payload as JwtPayload).email })
+                if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("access token verified")
                 return res.status(200).json({ msg: "Authorized" })
@@ -66,6 +63,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
 // refresh accesss token
 export const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+        // clear cache 
         res.setHeader('Cache-Control', 'no-store');
 
         const refreshToken = req.cookies.refreshToken
@@ -73,15 +71,15 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
             return res.status(403).json({ msg: "Unauthorized access" })
         }
 
+        // jwt token verification
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: jwt.VerifyErrors | null, payload: string | jwt.JwtPayload | undefined) => {
             if (err) {
                 res.clearCookie('refreshToken')
                 return res.status(403).json({ msg: "Unauthorized access" })
             } else {
-                //checking weather user is existing or not - through gRPC                
-                const response = await getUserFromAuthService((payload as JwtPayload).userId)
-                if (response.status === 404) return res.status(response.status).json({ msg: response.msg })
-                else if (response.status === 501) return next(response.msg)
+                //checking weather user is existing or not in user service db
+                const isUser = await User.findOne({ email: (payload as JwtPayload).email })
+                if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("refresh token verified")
                 const newAccessToken = jwt.sign({ userId: (payload as JwtPayload).userId }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '1m' })
@@ -96,13 +94,12 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 // get user
 export const getUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const userId = req.body.userId
+        const { email } = req.body.payload
 
-        const response = await getUserFromAuthService(userId);
-        if (response.status === 404) return res.status(response.status).json({ msg: response.msg })
-        else if (response.status === 501) return next(response.msg)
+        const user = await User.findOne({ email })
+        if (!user) return res.status(404).json({ msg: "User not found" })
 
-        res.status(response.status).json({ msg: response.msg, userData: response.user });
+        res.status(200).json({ userData: user })
 
     } catch (err) {
         next(err)
@@ -112,14 +109,12 @@ export const getUser = async (req: Request, res: Response, next: NextFunction): 
 // user update
 export const editUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { userId, name, email, image } = req.body
+        const { payload, name, email, image } = req.body
 
-        const response = await updateUserFromAuthService(userId, name, email, image)
-        if (response.status === 404) return res.status(response.status).json({ msg: response.msg })
-        else if (response.status === 409) return res.status(response.status).json({ msg: response.msg })
-        else if (response.status === 501) return next(response.msg)
+        const user = await User.findOne({ email: payload.email })
+        if (!user) return res.status(404).json({ msg: "User not found" })
 
-        res.status(response.status).json({ msg: response.msg })
+
 
     } catch (err: any) {
         next(err.message)
