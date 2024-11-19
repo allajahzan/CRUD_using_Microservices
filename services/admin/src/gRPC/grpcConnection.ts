@@ -8,7 +8,7 @@ const packageDefinition = protoLoader.loadSync(
 
 const adminProto = grpc.loadPackageDefinition(packageDefinition).admin;
 
-const client = new (adminProto as any).AdminService('0.0.0.0:50052', grpc.credentials.createInsecure());
+const client = new (adminProto as any).AdminService('notification:50052', grpc.credentials.createInsecure());
 
 // send request to notification service to send notification
 export const sendRequestToNotificationService = (id: string, email:string): Promise<any> => {

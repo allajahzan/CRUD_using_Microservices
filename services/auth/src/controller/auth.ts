@@ -8,7 +8,7 @@ import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getUpda
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export async function connect() {
-    const amqpServer = 'amqp://localhost:5672'
+    const amqpServer = 'amqp://rabbitmq:5672'
     let retries = 5
     while (retries) {
         try {
@@ -94,8 +94,7 @@ export const userLogin = async (req: Request, res: Response, next: NextFunction)
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         });
 
         res.status(200).json({ msg: 'Successfully logged In', accessToken })
@@ -116,8 +115,7 @@ export const userLogout = async (req: Request, res: Response, next: NextFunction
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         });
         res.sendStatus(200)
     } catch (err) {
@@ -148,8 +146,7 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         });
 
         res.status(200).json({ msg: 'Successfully logged In', accessToken })
@@ -170,8 +167,7 @@ export const adminLogout = async (req: Request, res: Response, next: NextFunctio
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         })
 
         res.sendStatus(200)

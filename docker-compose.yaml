@@ -38,9 +38,17 @@ services:
     build: ./services/admin
     container_name: crud_admin
     depends_on:
-     - rabbitmq      
+     - rabbitmq  
+     - notification    
     ports:
       - '3002:80'
+
+  notification:
+    build: ./services/notification
+    container_name: crud_notification  
+    ports:
+      - '3003:3003'
+      - '50052:50052'  
 
   rabbitmq:
     image: rabbitmq

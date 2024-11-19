@@ -35,7 +35,7 @@ export const grpcServerForAdminService = () => {
     try {
         const server = new grpc.Server()
         server.addService((adminProto as any).AdminService.service, { sendNotification })
-        server.bindAsync('0.0.0.0:50052', grpc.ServerCredentials.createInsecure(), () => {
+        server.bindAsync('notification:50052', grpc.ServerCredentials.createInsecure(), () => {
             console.log("Auth gRPC server for admin service running on port 50052")
         })
     } catch (err) {

@@ -7,7 +7,7 @@ import User from "../schema/user"
 // rabit mq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export async function connect() {
-    const amqpServer = 'amqp://localhost:5672';
+    const amqpServer = 'amqp://rabbitmq:5672';
     let retries = 5;
     while (retries) {
         try {
