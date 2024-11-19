@@ -9,7 +9,8 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-exports.sendEmail = (email:string, callback:any) => {
+export const sendEmail = (email: string, callback: any) => {
+    
     const mailOptions = {
         from: 'ahsanallajpk22@gmail.com',
         to: email,
@@ -17,7 +18,7 @@ exports.sendEmail = (email:string, callback:any) => {
         html: `<p>Your CRUD account has been deleted by admin. if you want create a new accound with same mail<p>`
     };
 
-    transporter.sendMail(mailOptions, function (error:any, info:any) {
+    transporter.sendMail(mailOptions, function (error: any, info: any) {
         if (error) {
             console.error(error);
             callback(error);

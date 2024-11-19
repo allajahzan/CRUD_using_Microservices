@@ -3,11 +3,12 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import amqp from 'amqplib'
 import { getNewUserCreatedFromAuthService, getUpdatedUserFromUserService } from "../rabbitmq/consumer";
 import User from "../schema/user";
+import { sendRequestToNotificationService } from "../gRPC/grpcConnection";
 
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export const connect = async () => {
-    const amqpServer = 'amqp://rabbitmq:5672';
+    const amqpServer = 'amqp://localhost:5672';
     let retries = 5
     while (retries) {
         try {
@@ -136,6 +137,9 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         channel.assertExchange(exchange, 'fanout', { durable: true })
         channel.publish(exchange, '', Buffer.from(JSON.stringify({ userId })))
         console.log('send message to exchange')
+
+        const response = await sendRequestToNotificationService(process.env.NOTIFICATION_ID as string, user.email)
+        console.log(response);
 
         res.status(200).json({ msg: "user data deleted" })
     } catch (err) {

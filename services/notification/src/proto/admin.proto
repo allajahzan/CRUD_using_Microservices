@@ -1,0 +1,17 @@
+syntax = 'proto3';
+
+package admin;
+
+service AdminService {
+   rpc sendNotification (sendNotificationRequest) returns (sendNotificationResponse);
+}
+
+message sendNotificationRequest {
+    string id = 1;
+    string email = 2;
+}
+
+message sendNotificationResponse {
+    int32 status = 1;
+    string msg = 2;
+}

@@ -8,7 +8,7 @@ import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getUpda
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export async function connect() {
-    const amqpServer = 'amqp://rabbitmq:5672'
+    const amqpServer = 'amqp://localhost:5672'
     let retries = 5
     while (retries) {
         try {
