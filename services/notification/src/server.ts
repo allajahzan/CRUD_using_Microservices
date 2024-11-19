@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import { Request, Response, NextFunction } from 'express'
+import nodemailer from 'nodemailer'
 
 // create app
 const app = express()
