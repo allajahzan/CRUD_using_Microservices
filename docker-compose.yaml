@@ -6,9 +6,9 @@ services:
     container_name: crud_nginx
     depends_on:
       - web
+      - auth
       - user
       - admin
-      - auth
     ports:
       - '80:80'
 
@@ -18,23 +18,27 @@ services:
     ports:
       - '5173:5173'
 
-  user:
-    build: ./services/user
-    container_name: crud_service_user
+  auth:
+    build: ./services/auth
+    container_name: crud_auth
     depends_on:
-      - rabbitmq
+     - rabbitmq      
     ports:
       - '3000:80'
 
-  admin:
-    build: ./services/admin
-    container_name: crud_service_admin
+  user:
+    build: ./services/user
+    container_name: crud_user
+    depends_on:
+      - rabbitmq
     ports:
       - '3001:80'
 
-  auth:
-    build: ./services/auth
-    container_name: crud_service_auth
+  admin:
+    build: ./services/admin
+    container_name: crud_admin
+    depends_on:
+     - rabbitmq      
     ports:
       - '3002:80'
 
