@@ -5,7 +5,7 @@ import User, { userType } from '../schema/user';
 export const getNewUserCreatedFromAuthService = (channel: amqp.Channel) => {
     try {
         const exchange = 'user.signup'
-        const queue = 'USER_CREATED_ADMIN_SERVICE'
+        const queue = 'USER_CREATED_FROM_AUTH_SERVICE_TO_ADMIN_SERVICE'
 
         // assert exchange and queue
         channel.assertExchange(exchange, 'fanout', { durable: true })
@@ -36,7 +36,7 @@ export const getNewUserCreatedFromAuthService = (channel: amqp.Channel) => {
 // get updated user from user service
 export const getUpdatedUserFromUserService = async (channel: amqp.Channel) => {
     const exhange = 'user.update'
-    const queue = 'USER_UPDATED_ADMIN_SERVICE'
+    const queue = 'USER_UPDATED_FROM_USER_SERVICE_TO_ADMIN_SERVICE'
 
     // assert exchange and queue
     channel.assertExchange(exhange, 'fanout', { durable: true })

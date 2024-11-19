@@ -16,11 +16,11 @@ export const connect = async () => {
             channel = await connection.createChannel()
             console.log("connected to RabbitMQ")
 
-            // messages from auth service
-
+            // messages from auth service---------------------
             // user.signup
             getNewUserCreatedFromAuthService(channel)
 
+            // messages from user service---------------------
             // user.udpate
             getUpdatedUserFromUserService(channel)
 
@@ -52,7 +52,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
             if (err) return res.status(403).json({ msg: "Unauthorized access" })
             else {
                 // check weather admin is existing or not in admin service db
-                const isAdmin = await User.findOne({ userId: (payload as jwt.JwtPayload).userId, isAdmin : true })
+                const isAdmin = await User.findOne({ userId: (payload as jwt.JwtPayload).userId, isAdmin: true })
                 if (!isAdmin) return res.status(404).json({ msg: 'Admin not found' })
 
                 console.log("access token verified")
@@ -83,7 +83,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
                 return res.status(403).json({ msg: "Unauthorized access" })
             } else {
                 //checking weather admin is existing or not in admin service db
-                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId, isAdmin:true })
+                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId, isAdmin: true })
                 if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("refresh token verified")
@@ -125,7 +125,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     try {
         const userId = req.params.userId
         console.log(userId);
-        
+
         const user = await User.findOne({ userId })
         if (!user) return res.status(410).json({ msg: 'no such user found' })
 
@@ -158,10 +158,39 @@ export const addUser = async (req: Request, res: Response, next: NextFunction): 
         // send message to exchange
         const exchange = 'user.create.admin'
         channel.assertExchange(exchange, 'fanout', { durable: true })
-        channel.publish(exchange, '', Buffer.from(JSON.stringify({newUser, password})))
+        channel.publish(exchange, '', Buffer.from(JSON.stringify({ newUser, password })))
         console.log("send message to exchange")
 
         res.status(200).json({ msg: 'user data created' })
+    } catch (err) {
+        next(err)
+    }
+}
+
+// update user
+export const editUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { _id, name, email, image } = req.body
+
+        const isUser = await User.findOne({ _id: { $ne: _id }, email })
+        if (isUser) return res.status(409).json({ msg: 'This email already exists' })
+
+        const user = await User.findById(_id)
+        if (!user) return res.status(410).json({ msg: 'no such user found' })
+
+        user.name = name
+        user.email = email
+        user.image = image
+        const updatedUser = await user.save()
+
+        // send message to exchange
+        const exchange = 'user.update.admin'
+        channel.assertExchange(exchange, 'fanout', { durable: true })
+        channel.publish(exchange, '', Buffer.from(JSON.stringify({ updatedUser })))
+        console.log("send message to exchange")
+
+        res.status(200).json({ msg: 'user data updated' })
+
     } catch (err) {
         next(err)
     }

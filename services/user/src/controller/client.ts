@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import amqp from 'amqplib'
-import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getNewUserCreatedFromAuthService } from "../rabbitmq/consumer"
+import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getNewUserCreatedFromAuthService, updatedUserFromAdminService } from "../rabbitmq/consumer"
 import User from "../schema/user"
 
 // rabit mq connection
@@ -17,17 +17,16 @@ export async function connect() {
             console.log("Connected to RabbitMQ");
 
             // message from auth service------------------------
-
             // user.signup
             getNewUserCreatedFromAuthService(channel)
 
             // message from admin service----------------------
-
             // user.create.admin
             getNewUserCreatedFromAdminService(channel)
             // user.delete.admin
             deletedUserFromAdminService(channel)
-
+            // user.update.admin
+            updatedUserFromAdminService(channel)
 
             break;
         } catch (err) {

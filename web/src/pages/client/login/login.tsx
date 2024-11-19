@@ -109,9 +109,9 @@ function Login() {
                     }
                 }
             })
-            .catch((err) => {
+            .catch((_err) => {
                 setCreate(false)
-                console.log(err)
+                alert('We are experiencing server issues. Please try again shortly');
             })
     }
 
@@ -154,9 +154,9 @@ function Login() {
                     setLogin(false)
                 }
             })
-            .catch((err) => {
+            .catch((_err) => {
                 setLogin(false)
-                console.log(err)
+                alert('We are experiencing server issues. Please try again shortly');
             })
     }
 

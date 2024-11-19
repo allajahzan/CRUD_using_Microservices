@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../schema/user'
 import amqp from 'amqplib'
-import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getUpdatedUserFromUserService } from '../rabbitmq/consumer'
+import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getUpdatedUserFromUserService, updatedUserFromAdminService } from '../rabbitmq/consumer'
 
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
@@ -21,13 +21,13 @@ export async function connect() {
             // user.update
             getUpdatedUserFromUserService(channel)
 
-            
-
             // message from admin service----------------------
             // user.create.admin
             getNewUserCreatedFromAdminService(channel)
             // user.delete.admin
             deletedUserFromAdminService(channel)
+            // user.update.admin
+            updatedUserFromAdminService(channel)
 
             break;
         } catch (err) {
@@ -94,7 +94,8 @@ export const userLogin = async (req: Request, res: Response, next: NextFunction)
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/'
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         res.status(200).json({ msg: 'Successfully logged In', accessToken })
@@ -116,6 +117,7 @@ export const userLogout = async (req: Request, res: Response, next: NextFunction
             sameSite: 'none',
             secure: true,
             path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
         res.sendStatus(200)
     } catch (err) {
@@ -146,7 +148,8 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/'
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         res.status(200).json({ msg: 'Successfully logged In', accessToken })
@@ -167,7 +170,8 @@ export const adminLogout = async (req: Request, res: Response, next: NextFunctio
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            path: '/'
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         })
 
         res.sendStatus(200)

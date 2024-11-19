@@ -47,23 +47,26 @@ function Login() {
             body: JSON.stringify(obj)
         })
             .then(async (res) => {
-                return await res.json()
-            })
-            .then((data) => {
-                if (data.accessToken) {
+                const data = await res.json()
+                if (res.ok) {
                     setEmail('')
                     setpassword('')
                     Cookies.set('adminAccessToken', data.accessToken)
                     disapatchFun(SetAdminToken(data.accessToken))
                     adminContext?.setAuth(true)
                 } else {
-                    setLogin(false)
-                    alert(data.msg)
+                    if (res.status === 401) {
+                        setLogin(false)
+                        alert(data.msg)
+                    }else {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        setLogin(false)
+                    }
                 }
             })
-            .catch((err) => {
+            .catch((_err) => {
                 setLogin(false)
-                console.log(err)
+                alert('We are experiencing server issues. Please try again shortly');
             })
     }
 

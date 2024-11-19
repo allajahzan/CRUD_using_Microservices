@@ -48,7 +48,7 @@ function EditUser() {
     const handleSubmit = (userId: string) => {
 
         const formData = new FormData()
-        formData.append('id', userId)
+        formData.append('_id', userId)
         formData.append('name', nameInput)
         formData.append('email', emailInput)
         formData.append('image', image as string)
@@ -70,17 +70,24 @@ function EditUser() {
                         })
                             .then(async (res) => {
                                 const data = await res.json()
-                                if (res.status === 401) {
-                                    editUser()
-                                } else if (res.status === 409) {
+                                if (res.ok) {
                                     setUpdate(false)
-                                    alert(data.msg)
-                                }
-                                else {
-                                    setUpdate(false)
+                                } else {
+                                    if (res.status === 401) {
+                                        editUser()
+                                    } else if (res.status === 409) {
+                                        setUpdate(false)
+                                        alert(data.msg)
+                                    }
+                                    else {
+                                        alert('We are experiencing server issues. Please try again shortly');
+                                        setUpdate(false)
+                                    }
                                 }
                             })
-
+                            .catch((_err) => {
+                                alert('We are experiencing server issues. Please try again shortly');
+                            })
                     } else {
                         adminContext?.logout()
                     }

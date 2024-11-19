@@ -55,8 +55,8 @@ function Users() {
                                 }
                             }
                         })
-                        .catch((err) => {
-                            console.log(err)
+                        .catch((_err) => {
+                            alert('We are experiencing server issues. Please try again shortly');
                         })
                 } else if (newAccessToken === undefined) {
                     alert('We are experiencing server issues. Please try again shortly');
@@ -97,8 +97,8 @@ function Users() {
                                     }
                                 }
                             })
-                            .catch((err) => {
-                                console.log(err)
+                            .catch((_err) => {
+                                alert('We are experiencing server issues. Please try again shortly');
                             })
                     } else if (newAccessToken === undefined) {
                         alert('We are experiencing server issues. Please try again shortly');

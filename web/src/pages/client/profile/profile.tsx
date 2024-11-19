@@ -90,9 +90,9 @@ function Profile() {
                                     }
                                 }
                             })
-                            .catch((err) => {
+                            .catch((_err) => {
                                 setUpdate(false)
-                                console.log(err);
+                                alert('We are experiencing server issues. Please try again shortly');
                             })
                     } else if (newAccesstoken === undefined) {
                         alert('We are experiencing server issues. Please try again shortly');
