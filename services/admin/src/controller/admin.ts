@@ -52,7 +52,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
             if (err) return res.status(403).json({ msg: "Unauthorized access" })
             else {
                 // check weather admin is existing or not in admin service db
-                const isAdmin = await User.findOne({ userId: (payload as jwt.JwtPayload).userId })
+                const isAdmin = await User.findOne({ userId: (payload as jwt.JwtPayload).userId, isAdmin : true })
                 if (!isAdmin) return res.status(404).json({ msg: 'Admin not found' })
 
                 console.log("access token verified")
@@ -83,7 +83,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
                 return res.status(403).json({ msg: "Unauthorized access" })
             } else {
                 //checking weather admin is existing or not in admin service db
-                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId })
+                const isUser = await User.findOne({ userId: (payload as JwtPayload).userId, isAdmin:true })
                 if (!isUser) return res.status(404).json({ msg: "User not found" })
 
                 console.log("refresh token verified")
@@ -124,15 +124,17 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction):
 export const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const userId = req.params.userId
-        const user = await User.findOne({ userId: userId })
+        console.log(userId);
+        
+        const user = await User.findOne({ userId })
         if (!user) return res.status(410).json({ msg: 'no such user found' })
 
-        await User.deleteOne({ userId: userId })
+        await User.deleteOne({ userId })
 
         // send message to exchange in rabbit mq
         const exchange = 'user.delete.admin'
         channel.assertExchange(exchange, 'fanout', { durable: true })
-        channel.publish(exchange, '', Buffer.from(JSON.stringify({ userId: userId })))
+        channel.publish(exchange, '', Buffer.from(JSON.stringify({ userId })))
         console.log('send message to exchange')
 
         res.status(200).json({ msg: "user data deleted" })
@@ -141,3 +143,26 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     }
 }
 
+// add user
+export const addUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { name, email, password, image } = req.body
+
+        const isUser = await User.findOne({ email })
+        if (isUser) return res.status(409).json({ msg: 'This email already exists' })
+
+        const newUser = new User({ name, email, image, isAdmin: false, userId: undefined })
+        newUser.userId = (newUser._id).toString()
+        await newUser.save()
+
+        // send message to exchange
+        const exchange = 'user.create.admin'
+        channel.assertExchange(exchange, 'fanout', { durable: true })
+        channel.publish(exchange, '', Buffer.from(JSON.stringify({newUser, password})))
+        console.log("send message to exchange")
+
+        res.status(200).json({ msg: 'user data created' })
+    } catch (err) {
+        next(err)
+    }
+}

@@ -25,6 +25,7 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
             AdminAuth(accessToken)
                 .then((newAccessToken) => {
                     if (newAccessToken) {
+                        setAuth(true)
                         disaptchFun(SetAdminToken(newAccessToken))
                         Cookies.set('adminAccessToken', newAccessToken)
 
@@ -35,19 +36,25 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
                             }
                         })
                             .then(async (res) => {
-                                if (res.status === 403) {
-                                    checkAdminAuth()
-                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-                                    logout()
-                                } else {
+                                if (res.ok) {
                                     const data = await res.json()
                                     disaptchFun(UpdateAdmin(data.userData))
+                                } else {
+                                    if (res.status === 403) {
+                                        checkAdminAuth()
+                                    } else if (res.status === 404) {
+                                        logout()
+                                    }
                                 }
                             })
                             .catch((err) => {
                                 console.log(err)
                             })
-                    } else {
+                    } else if (newAccessToken === undefined) {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        logout()
+                    }
+                    else {
                         logout()
                     }
                 })
@@ -69,6 +76,8 @@ const AdminContexetProvider = ({ children }: { children: ReactNode }) => {
                     disaptchFun(UpdateAdmin(null))
                     Cookies.remove('adminAccessToken')
                     setAuth(false)
+                } else {
+                    alert('We are experiencing server issues. Please try again shortly');
                 }
             })
             .catch((err) => {

@@ -3,7 +3,7 @@ syntax = 'proto3';
 package user;
 
 NotificationService service {
-    refreshToken (refreshTokenRequest) returns (refreshTokenResponse);
+    addUser (addUserRequest) returns (refreshTokenResponse);
 }
 
 refreshTokenRequest {

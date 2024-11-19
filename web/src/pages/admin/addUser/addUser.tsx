@@ -9,6 +9,7 @@ import { SetAdminToken } from '../../../redux/store'
 import Cookies from 'js-cookie'
 import { AdminContext } from '../../../context/adminContext'
 import pic from '../../../assets/pic1.jpg'
+import { useNavigate } from 'react-router-dom'
 
 
 function AddUser() {
@@ -17,6 +18,7 @@ function AddUser() {
     const disaptchFun = useDispatch()
 
     const adminContext = useContext(AdminContext)
+    const navigate = useNavigate()
 
     const [nameInput, setName] = useState<string>('')
     const [emailInput, setEmail] = useState<string>('')
@@ -55,7 +57,7 @@ function AddUser() {
                         disaptchFun(SetAdminToken(newAccessToken))
                         Cookies.set('adminAccessToken', newAccessToken)
 
-                        fetch('http://localhost:3000/admin/addUser', {
+                        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/addUser`, {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${newAccessToken}`
@@ -64,22 +66,38 @@ function AddUser() {
                         })
                             .then(async (res) => {
                                 const data = await res.json()
-                                if (res.status === 401) {
-                                    addUser()
-                                } else if (res.status === 409) {
+                                if (res.ok) {
                                     setUpdate(false)
-                                    alert(data.msg)
-                                }
-                                else {
-                                    setUpdate(false)
-                                    alert(data.msg)
                                     setName('')
                                     setEmail('')
                                     setpassword('')
                                     setImgae('')
+                                    navigate('/admin/users')
+                                } else {
+                                    if (res.status === 403) {
+                                        addUser()
+                                    }
+                                    else if (res.status === 404) {
+                                        console.log("Require login")
+                                        adminContext?.logout()
+                                    }
+                                    else if (res.status === 409) {
+                                        setEmail('')
+                                        setUpdate(false)
+                                        alert(data.msg)
+                                    }
+                                    else {
+                                        alert('We are experiencing server issues. Please try again shortly');
+                                        setUpdate(false)
+                                    }
                                 }
                             })
-
+                            .catch((err => {
+                                console.log(err)
+                            }))
+                    } else if (newAccessToken === undefined) {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        adminContext?.logout()
                     } else {
                         adminContext?.logout()
                     }
@@ -87,13 +105,12 @@ function AddUser() {
         }
 
         addUser()
-
     }
 
     return (
         <div style={{
-            backgroundImage:`url(${pic})`,
-            backgroundSize:'cover'
+            backgroundImage: `url(${pic})`,
+            backgroundSize: 'cover'
         }} className="h-screen w-full bg-white relative flex items-center justify-center">
             <NavbarComponent />
             <div className='flex flex-col justify-center gap-5 p-10 w-full sm:w-[450px] md:w-[450px] h-full sm:h-[520px] bg-black bg-opacity-40'>
@@ -119,7 +136,7 @@ function AddUser() {
                     </div>}
                 </form>
             </div>
-            
+
         </div>
     )
 }

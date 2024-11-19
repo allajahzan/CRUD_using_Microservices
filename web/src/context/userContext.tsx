@@ -34,20 +34,25 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                     }
                 })
                     .then(async (res) => {
-                        if (res.status === 403) {
-                            checkUserAuth()
-                        } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-                            logout()
-                        }
-                        else {
+                        if (res.ok) {
                             const data = await res.json()
                             disaptchFun(UpdateUser(data.userData))
+                        } else {
+                            if (res.status === 403) {
+                                checkUserAuth()
+                            } else if (res.status === 404) {
+                                logout()
+                            }
                         }
                     })
                     .catch((err) => {
                         console.log(err)
                     })
-            } else {
+            } else if (newAccesstoken === undefined) {
+                alert('We are experiencing server issues. Please try again shortly');
+                logout()
+            }
+            else {
                 logout()
             }
         }
@@ -66,7 +71,9 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                     disaptchFun(UpdateUser(null))
                     Cookies.remove('accessToken')
                     setAuth(false)
-                } 
+                } else {
+                    alert('We are experiencing server issues. Please try again shortly');
+                }
             })
             .catch((err) => {
                 console.log(err)

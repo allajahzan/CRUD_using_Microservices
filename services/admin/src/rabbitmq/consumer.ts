@@ -17,7 +17,10 @@ export const getNewUserCreatedFromAuthService = (channel: amqp.Channel) => {
         // consume message from queue
         channel.consume(queue, async (data: any) => {
             const user = JSON.parse(data.content)
-            const newUser = new User({ userId: user._id, name: user.name, email: user.email, image: user.image, isAdmin : user.isAdmin })
+            // delete the user having the same email
+            await User.deleteOne({ email: user.email })
+
+            const newUser = new User({ userId: user._id, name: user.name, email: user.email, image: user.image })
             await newUser.save()
 
             // acknowledge the queue
@@ -46,7 +49,7 @@ export const getUpdatedUserFromUserService = async (channel: amqp.Channel) => {
     channel.consume(queue, async (data: any) => {
         const message = JSON.parse(data.content)
         const updatedUser: userType = message.updatedUser
-        const user = await User.findOne({userId : updatedUser.userId})
+        const user = await User.findOne({ userId: updatedUser.userId })
         if (!user) {
             // acknowledge the queue
             channel.ack(data)

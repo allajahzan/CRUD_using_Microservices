@@ -14,16 +14,18 @@ async function refreshAccessToken() {
             method: 'GET',
             credentials: 'include'
         });
-        if (res.status === 403 || res.status === 404 || res.status === 501 || res.status === 502) {
-            return null
-        } else {
+        if (res.ok) {
             const data = await res.json()
             return data.newAccessToken
+        } else {
+            if (res.status === 403 || res.status === 404) {
+                return null
+            } 
         }
     }
     catch (err) {
         console.log(err)
-        return null
+        return undefined
     }
 }
 
@@ -36,21 +38,21 @@ export const verifyToken = (accessToken: string) => fetch(`${import.meta.env.VIT
     },
 })
     .then(async (res) => {
-        if (res.status === 403) {
-            const newAccessToken = await refreshAccessToken()
-            if (newAccessToken) {
+        if (res.ok) {
+            return accessToken
+        } else {
+            if (res.status === 403) {
+                const newAccessToken = await refreshAccessToken()
                 return newAccessToken
-            } else {
+            } else if (res.status === 404) {
+                alert("admin not found")
                 return null
-            }
-        } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-            return null
+            } 
         }
-        return accessToken
     })
     .catch((err) => {
         console.log(err)
-        return false
+        return undefined
     })
 
 
@@ -58,10 +60,7 @@ export async function AdminAuth(accessToken: string) {
     // main logic
     if (isTokenExpired(accessToken)) {
         const newAccessToken = await refreshAccessToken()
-        if (newAccessToken) {
-            return newAccessToken
-        }
-        return null
+        return newAccessToken
     } else {
         return await verifyToken(accessToken)
     }

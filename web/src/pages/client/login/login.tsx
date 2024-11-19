@@ -92,13 +92,21 @@ function Login() {
         })
             .then(async (res) => {
                 const data = await res.json()
-                if (res.status === 409) {
+                if (res.ok) {
+                    setName('')
                     setEmail('')
-                    setCreate(false)
-                    alert(data.msg)
-                } else {
+                    setpassword('')
                     setMove(false)
                     setCreate(false)
+                } else {
+                    if (res.status === 409) {
+                        setEmail('')
+                        setCreate(false)
+                        alert(data.msg)
+                    } else {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        setCreate(false)
+                    }
                 }
             })
             .catch((err) => {
@@ -131,19 +139,19 @@ function Login() {
             body: JSON.stringify(obj)
         })
             .then(async (res) => {
-                return await res.json()
-            })
-            .then((data) => {
-                const accessToken: string = data.accessToken
-                if (accessToken) {
+                const data = await res.json()
+                if (res.ok) {
                     setEmailSignIn('')
                     setpasswordSignIn('')
-                    Cookies.set('accessToken', accessToken, { path: '/', sameSite: 'None', secure: true })
-                    disaptchFun(SetToken(accessToken))
+                    Cookies.set('accessToken', data.accessToken, { path: '/', sameSite: 'None', secure: true })
+                    disaptchFun(SetToken(data.accessToken))
                     userContext?.setAuth(true)
-                } else {
+                } else if (res.status === 401) {
                     setLogin(false)
                     alert(data.msg)
+                } else {
+                    alert('We are experiencing server issues. Please try again shortly');
+                    setLogin(false)
                 }
             })
             .catch((err) => {

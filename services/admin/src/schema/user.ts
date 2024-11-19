@@ -11,7 +11,7 @@ export interface userType {
 const userSchema = new Schema<userType>({
     userId: {
         type: String,
-        required: true
+        required: false
     },
     name: {
         type: String,
@@ -27,7 +27,7 @@ const userSchema = new Schema<userType>({
     },
     isAdmin: {
         type: Boolean,
-        require: true
+        default : false
     }
 }, { timestamps: true })
 

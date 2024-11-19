@@ -39,20 +39,28 @@ function Users() {
                         })
                         .then(async (res) => {
                             const data = await res.json()
-                            if (res.status === 403) {
-                                handleDelete(userId)
-                            } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-                                adminContext?.logout()
-                            } else if (res.status === 410) {
-                                alert(data.msg)
-                            } else {
+                            if (res.ok) {
                                 const newUsers = (users as object[]).filter((user) => (user as any).userId !== userId)
                                 setUsers(newUsers)
+                            } else {
+                                if (res.status === 403) {
+                                    handleDelete(userId)
+                                } else if (res.status === 404) {
+                                    alert('Require login')
+                                    adminContext?.logout()
+                                } else if (res.status === 410) {
+                                    alert(data.msg)
+                                } else {
+                                    alert('We are experiencing server issues. Please try again shortly');
+                                }
                             }
                         })
                         .catch((err) => {
                             console.log(err)
                         })
+                } else if (newAccessToken === undefined) {
+                    alert('We are experiencing server issues. Please try again shortly');
+                    adminContext?.logout()
                 } else {
                     adminContext?.logout()
                 }
@@ -75,16 +83,26 @@ function Users() {
                         })
                             .then(async (res) => {
                                 const data = await res.json()
-                                if (res.status === 403) {
-                                    getUsers()
-                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-                                    adminContext?.logout()
-                                }
-                                else {
+                                if (res.ok) {
                                     setUsers(data.users)
+                                } else {
+                                    if (res.status === 403) {
+                                        getUsers()
+                                    } else if (res.status === 404) {
+                                        console.log("Require login")
+                                        adminContext?.logout()
+                                    }
+                                    else {
+                                        alert('We are experiencing server issues. Please try again shortly');
+                                    }
                                 }
                             })
-
+                            .catch((err) => {
+                                console.log(err)
+                            })
+                    } else if (newAccessToken === undefined) {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        adminContext?.logout()
                     } else {
                         adminContext?.logout()
                     }

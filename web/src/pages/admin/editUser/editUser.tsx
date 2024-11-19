@@ -45,8 +45,8 @@ function EditUser() {
     }, [])
 
 
-    const handleSubmit = (userId:string) => {
-        
+    const handleSubmit = (userId: string) => {
+
         const formData = new FormData()
         formData.append('id', userId)
         formData.append('name', nameInput)
@@ -61,7 +61,7 @@ function EditUser() {
                         disaptchFun(SetAdminToken(newAccessToken))
                         Cookies.set('adminAccessToken', newAccessToken)
 
-                        fetch('http://localhost:3000/admin/editUser', {
+                        fetch(`${import.meta.env.VITE_SERVICE_BASE_URL}/admin/editUser`, {
                             method: 'PATCH',
                             headers: {
                                 'Authorization': `Bearer ${newAccessToken}`
@@ -98,7 +98,7 @@ function EditUser() {
             <NavbarComponent />
             <div className='flex flex-col justify-center gap-5 p-10 w-full sm:w-[450px] md:w-[450px] h-full sm:h-[520px] bg-black bg-opacity-40'>
                 {/* <p className='bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-300 text-xl text-center font-base p-2 pl-0'>User Profile</p> */}
-                <form className='flex flex-col items-center gap-5' action="" onSubmit={(event)=>{ event?.preventDefault(); handleSubmit(location.state._id) }}>
+                <form className='flex flex-col items-center gap-5' action="" onSubmit={(event) => { event?.preventDefault(); handleSubmit(location.state._id) }}>
                     {image ?
                         <div className='relative flex justify-center items-center bg-transparent border rounded-full h-36 w-36 mb-5 cursor-pointer overflow-hidden'>
                             <img className='w-full h-full object-cover cursor-pointer' src={image} alt="" />

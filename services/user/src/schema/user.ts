@@ -27,7 +27,7 @@ const userSchema = new Schema<userType>({
     },
     isAdmin: {
         type: Boolean,
-        require: true
+        default: false
     }
 }, { timestamps: true })
 

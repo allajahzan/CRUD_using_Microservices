@@ -71,25 +71,34 @@ function Profile() {
                         })
                             .then(async (res) => {
                                 const data = await res.json()
-                                if (res.status === 403) {
-                                    updateUser()
-                                } else if (res.status === 404 || res.status === 501 || res.status === 502) {
-                                    userContext?.logout()
-                                } else if (res.status === 409) {
+                                if (res.ok) {
+                                    dispathFun(UpdateUser({ name: nameInput, email: emailInput, image: image }))
                                     setUpdate(false)
-                                    alert(data.msg)
-                                }
-                                else {
-                                    dispathFun(UpdateUser({name:nameInput,email:emailInput,image:image}))
-                                    setUpdate(false)
+                                } else {
+                                    if (res.status === 403) {
+                                        updateUser()
+                                    } else if (res.status === 404) {
+                                        alert("Require login")
+                                        userContext?.logout()
+                                    } else if (res.status === 409) {
+                                        setUpdate(false)
+                                        alert(data.msg)
+                                    }
+                                    else {
+                                        alert('We are experiencing server issues. Please try again shortly');
+                                        setUpdate(false)
+                                    }
                                 }
                             })
                             .catch((err) => {
                                 setUpdate(false)
                                 console.log(err);
                             })
-
-                    } else {
+                    } else if (newAccesstoken === undefined) {
+                        alert('We are experiencing server issues. Please try again shortly');
+                        userContext?.logout()
+                    }
+                    else {
                         userContext?.logout()
                     }
                 })
