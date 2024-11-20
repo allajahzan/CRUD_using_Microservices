@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nginx:
-    build: ./nginx
+    image: allajahzan/crud-micro:nginx
     container_name: crud_nginx
     depends_on:
       - web
@@ -13,13 +13,13 @@ services:
       - '80:80'
 
   web:
-    build: ./web
+    image: allajahzan/crud-micro:web
     container_name: crud_web
     ports:
       - '5173:5173'
 
   auth:
-    build: ./services/auth
+    image: allajahzan/crud-micro:auth
     container_name: crud_auth
     depends_on:
      - rabbitmq      
@@ -27,7 +27,7 @@ services:
       - '3000:80'
 
   user:
-    build: ./services/user
+    image: allajahzan/crud-micro:user
     container_name: crud_user
     depends_on:
       - rabbitmq
@@ -35,7 +35,7 @@ services:
       - '3001:80'
 
   admin:
-    build: ./services/admin
+    image: allajahzan/crud-micro:admin
     container_name: crud_admin
     depends_on:
      - rabbitmq  
@@ -44,7 +44,7 @@ services:
       - '3002:80'
 
   notification:
-    build: ./services/notification
+    image: allajahzan/crud-micro:notification
     container_name: crud_notification  
     ports:
       - '3003:3003'
