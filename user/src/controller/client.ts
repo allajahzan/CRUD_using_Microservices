@@ -119,6 +119,9 @@ export const editUser = async (req: Request, res: Response, next: NextFunction):
     try {
         const { payload, name, email, image } = req.body
 
+        const isUser = await User.findOne({userId: {$ne:payload.userId}, email})
+        if(isUser) return res.status(409).json({msg:'This email already exists'})
+
         const user = await User.findOne({ userId: payload.userId })
         if (!user) return res.status(404).json({ msg: "User not found" })
 
