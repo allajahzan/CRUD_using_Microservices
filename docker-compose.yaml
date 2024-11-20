@@ -51,6 +51,9 @@ services:
   notification:
     image: allajahzan/crud-micro:notification
     container_name: crud_notification  
+    environment:
+      - PORT = 3003
+      - NOTIFICATION_ID = asdfghjkloiuytrewwdfghjklkjhgdfghjk
     ports:
       - '3003:3003'
       - '50052:50052'  

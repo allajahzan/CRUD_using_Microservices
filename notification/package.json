@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "copy-proto": "cp -R src/proto dist/proto",
-    "start": "node dist/server.js",
+    "start": "ts-node src/server.ts",
     "dev": "nodemon src/server.ts"
   },
   "author": "allaj",
