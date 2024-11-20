@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-web-config
+data:
+  VITE_SERVICE_BASE_URL: http://localhost

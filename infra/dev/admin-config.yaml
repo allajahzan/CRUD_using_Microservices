@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-admin-config
+data:
+  PORT: 3002
+  MONGO_URL: mongodb+srv://ahsanallajpk23:JT6xDCqwyglGw0TA@admin-service.2682w.mongodb.net/?retryWrites=true&w=majority&appName=Admin-service
+  REFRESH_TOKEN_SECRET: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzM0OTVlOTVjY2Y4YTE5NTY5NzRlMGEiLCJpYXQiOjE3MzE0OTk1MjB9.qKmf9W2EhnFwh7eSEhX6K93nusu8Tp0-HIEuPeMTVuY
+  ACCESS_TOKEN_SECRET: qKmf9W2EhnFwh7eSEhX6K93nusu8Tp0-HIEuPeMTVuYeyJ.eyJ1c2VySWQiOiI2NzM0OTVlOTVjY2Y4YTE5NTY.hbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.5NzRlMGEiLCJpYXQiOjE3MzE0OTk1MjB9
+  NOTIFICATION_ID: asdfghjkloiuytrewwdfghjklkjhgdfghjk

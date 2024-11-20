@@ -1,0 +1,41 @@
+# deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-depl
+  labels:
+    app: admin
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: admin
+  template:
+    metadata:
+      labels:
+        app: admin
+    spec:
+      containers:
+      - name: admin-cont
+        image: allajahzan/crud-micro:admin  
+        envFrom:
+            - configMapRef:
+                name: env-admin-config
+
+
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-srv
+spec:
+  type: NodePort
+  selector:
+    app: admin
+  ports:
+    - name: admin
+      protocol: TCP
+      port: 3002  # The external service port
+      targetPort: 3002 # The container port
+
+
