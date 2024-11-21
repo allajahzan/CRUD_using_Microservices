@@ -1,5 +1,5 @@
 # web
-web/.env
+services/web/.env
 
 # auth service
 services/auth/.env
