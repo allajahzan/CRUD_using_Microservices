@@ -56,8 +56,9 @@ jobs:
 
       - name: Authenticate with Kubernetes
         run: |
-          export KUBECONFIG=$(minikube kubeconfig)
+          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
+          export KUBECONFIG=kubeconfig
 
       - name: Apply Kubernetes Manifests
         run: |
-          kubectl apply -f ./infra/k8s/dev/*.yaml
+          kubectl apply -f /infra/k8s/dev/
