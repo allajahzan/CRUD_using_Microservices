@@ -56,9 +56,14 @@ jobs:
 
       - name: Authenticate with Kubernetes
         run: |
-          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
-          export KUBECONFIG=kubeconfig
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          kubectl cluster-info
 
       - name: Apply Kubernetes Manifests
         run: |
           kubectl apply -f ./infra/k8s/dev/
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods   
