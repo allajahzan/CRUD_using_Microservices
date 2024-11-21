@@ -7,13 +7,14 @@ import User from "../schema/user"
 // rabit mq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export async function connect() {
-    const amqpServer = 'amqp://rabbitmq:5672';
-    let retries = 5;
+    // const amqpServer = 'amqp://rabbitmq:5672'; // docker compose
+    const amqpServer = 'amqp://rabbitmq-srv.default.svc.cluster.local:5672' // kuberntes clustor
+    let retries = 5
     while (retries) {
         try {
             // rabbitmq connection and channel
-            connection = await amqp.connect(amqpServer);
-            channel = await connection.createChannel();
+            connection = await amqp.connect(amqpServer)
+            channel = await connection.createChannel()
             console.log("Connected to RabbitMQ");
 
             // message from auth service------------------------
@@ -30,7 +31,7 @@ export async function connect() {
 
             break;
         } catch (err) {
-            console.log("Failed to connect to RabbitMQ. Retrying in 5 seconds", err);
+            console.log("Failed to connect to RabbitMQ. Retrying in 5 seconds", err)
             retries -= 1;
             await new Promise(res => setTimeout(res, 5000));
         }
@@ -119,8 +120,8 @@ export const editUser = async (req: Request, res: Response, next: NextFunction):
     try {
         const { payload, name, email, image } = req.body
 
-        const isUser = await User.findOne({userId: {$ne:payload.userId}, email})
-        if(isUser) return res.status(409).json({msg:'This email already exists'})
+        const isUser = await User.findOne({ userId: { $ne: payload.userId }, email })
+        if (isUser) return res.status(409).json({ msg: 'This email already exists' })
 
         const user = await User.findOne({ userId: payload.userId })
         if (!user) return res.status(404).json({ msg: "User not found" })

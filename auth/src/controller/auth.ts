@@ -8,7 +8,8 @@ import { getNewUserCreatedFromAdminService, deletedUserFromAdminService, getUpda
 // rabbitmq connection
 let connection: amqp.Connection, channel: amqp.Channel;
 export async function connect() {
-    const amqpServer = 'amqp://rabbitmq:5672'
+     // const amqpServer = 'amqp://rabbitmq:5672'; // docker compose
+    const amqpServer = 'amqp://rabbitmq-srv.default.svc.cluster.local:5672' // kuberntes clustor
     let retries = 5
     while (retries) {
         try {
