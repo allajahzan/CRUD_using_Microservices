@@ -65,4 +65,4 @@ jobs:
 
       - name: Apply Kubernetes Manifests
         run: |
-          kubectl apply -f .../infra/k8s/dev/
+          kubectl apply -f ./infra/k8s/dev/
