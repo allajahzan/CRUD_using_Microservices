@@ -14,9 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Debug Secrets
-        run: echo "Username: ${{ secrets.DOCKER_USERNAME }}"  
+        run: |
+          echo "Username: ${{ secrets.DOCKER_USERNAME }}"
 
       - name: Log out of Docker 
         run: docker logout
