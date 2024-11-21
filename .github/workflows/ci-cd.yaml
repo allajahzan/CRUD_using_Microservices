@@ -15,10 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug Secrets
-        run: |
-          echo "Username: ${{ secrets.DOCKER_USERNAME }}"
-
       - name: Log out of Docker 
         run: docker logout
 
@@ -61,7 +57,7 @@ jobs:
       - name: Authenticate with Kubernetes
         run: |
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
-          export KUBECONFIG=kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
 
       - name: Apply Kubernetes Manifests
         run: |
