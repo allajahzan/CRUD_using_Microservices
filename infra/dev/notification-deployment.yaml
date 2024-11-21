@@ -38,7 +38,7 @@ spec:
       protocol: TCP
       port: 3003
       targetPort: 3003
-    - name: gRPC
+    - name: grpc
       protocol: TCP
       port: 50052 # The external service port
       targetPort: 50052 # The container port
