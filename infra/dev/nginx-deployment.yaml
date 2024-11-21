@@ -18,7 +18,9 @@ spec:
       containers:
       - name: nginx-cont
         image: allajahzan/crud-micro:nginx  
+        imagePullPolicy: Always 
 
+---
 
 # service
 apiVersion: v1

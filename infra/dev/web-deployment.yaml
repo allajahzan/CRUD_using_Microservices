@@ -18,9 +18,12 @@ spec:
       containers:
       - name: web-cont
         image: allajahzan/crud-micro:web  
+        imagePullPolicy: Always
         envFrom:
             - configMapRef:
                 name: env-web-config
+
+---
 
 # service
 apiVersion: v1

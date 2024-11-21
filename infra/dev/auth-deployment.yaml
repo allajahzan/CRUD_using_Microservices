@@ -18,10 +18,12 @@ spec:
       containers:
       - name: auth-cont
         image: allajahzan/crud-micro:auth  
+        imagePullPolicy: Always
         envFrom:
             - configMapRef:
                 name: env-auth-config
 
+---
 
 # service
 apiVersion: v1

@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: env-notification-config
 data:
-  PORT: 3003
-  NOTIFICATION_ID: asdfghjkloiuytrewwdfghjklkjhgdfghjk
+  PORT: "3003"
+  NOTIFICATION_ID: "asdfghjkloiuytrewwdfghjklkjhgdfghjk"

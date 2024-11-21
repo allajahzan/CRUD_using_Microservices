@@ -61,7 +61,7 @@ services:
       - "50052:50052"
 
   rabbitmq:
-    image: rabbitmq
+    image: allajahzan/crud-micro:rabbitmq
     container_name: rabbitmq
     ports:
       - "5672:5672"

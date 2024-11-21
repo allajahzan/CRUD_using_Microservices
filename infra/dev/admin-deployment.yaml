@@ -18,10 +18,12 @@ spec:
       containers:
       - name: admin-cont
         image: allajahzan/crud-micro:admin  
+        imagePullPolicy: Always 
         envFrom:
             - configMapRef:
                 name: env-admin-config
 
+---
 
 # service
 apiVersion: v1
