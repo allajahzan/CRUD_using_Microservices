@@ -16,7 +16,7 @@ services:
     image: allajahzan/crud-micro:web
     container_name: crud_web
     env_file:
-      - ./web/.env
+      - ../web/.env
     ports:
       - "5173:5173"
 
@@ -24,7 +24,7 @@ services:
     image: allajahzan/crud-micro:auth
     container_name: crud_auth
     env_file:
-      - ./auth/.env
+      - ../services/auth/.env
     depends_on:
       - rabbitmq
     ports:
@@ -34,7 +34,7 @@ services:
     image: allajahzan/crud-micro:user
     container_name: crud_user
     env_file:
-      - ./user/.env
+      - ../services/user/.env
     depends_on:
       - rabbitmq
     ports:
@@ -44,7 +44,7 @@ services:
     image: allajahzan/crud-micro:admin
     container_name: crud_admin
     env_file:
-      - ./admin/.env
+      - ../services/admin/.env
     depends_on:
       - rabbitmq
       - notification
@@ -55,7 +55,7 @@ services:
     image: allajahzan/crud-micro:notification
     container_name: crud_notification
     env_file:
-      - ./notification/.env
+      - ../services/notification/.env
     ports:
       - "3003:3003"
       - "50052:50052"
