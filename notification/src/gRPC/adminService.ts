@@ -35,7 +35,9 @@ export const grpcServerForAdminService = () => {
     try {
         const server = new grpc.Server()
         server.addService((adminProto as any).AdminService.service, { sendNotification })
-        server.bindAsync('notification:50052', grpc.ServerCredentials.createInsecure(), () => {
+        // notification:50052 - docker compose
+        // notification-srv.default.svc.cluster.local:50052 - kubernets clustor
+        server.bindAsync('notification-srv.default.svc.cluster.local:50052', grpc.ServerCredentials.createInsecure(), () => {
             console.log("Auth gRPC server for admin service running on port 50052")
         })
     } catch (err) {

@@ -8,7 +8,9 @@ const packageDefinition = protoLoader.loadSync(
 
 const adminProto = grpc.loadPackageDefinition(packageDefinition).admin;
 
-const client = new (adminProto as any).AdminService('notification:50052', grpc.credentials.createInsecure());
+// notification:50052 - docker compose
+// notification-srv.default.svc.cluster.local:50052 - kubernets clustor
+const client = new (adminProto as any).AdminService('notification-srv.default.svc.cluster.local:50052', grpc.credentials.createInsecure());
 
 // send request to notification service to send notification
 export const sendRequestToNotificationService = (id: string, email:string): Promise<any> => {
