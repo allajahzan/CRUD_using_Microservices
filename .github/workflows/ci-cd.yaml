@@ -8,7 +8,9 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        service: ["nginx", "web", "auth", "user", "admin", "notification"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,8 +24,8 @@ jobs:
       - name: Build and Push Images
         uses: docker/build-push-action@v4
         with:
-          context: .../services/${{ matrix.service }}
-          file: .../services/${{ matrix.service }}/Dockerfile
+          context: ./services/${{ matrix.service }}
+          file: ./services/${{ matrix.service }}/Dockerfile
           push: true
           tags: |
             allajahzan/crud-micro:nginx
@@ -35,9 +37,6 @@ jobs:
           build-args: |
             IMAGE_NAME=${{ matrix.service }}
 
-      strategy:
-        matrix:
-          service: ["nginx", "web", "auth", "user", "admin", "notification"]
 
   deploy:
     runs-on: ubuntu-latest
