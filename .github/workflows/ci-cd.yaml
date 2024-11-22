@@ -48,20 +48,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "latest"
-
-      - name: start minikube
+      - name: Start Minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
 
-      - name: Build image
-        run: |
-          minikube image build -t local/devex:v1 .  
-
-      - name: Apply Kubernetes Manifests
+      - name: Apply Kubernetes Manifests to Minikube Clustor
         run: |
           kubectl apply -f ./infra/k8s/dev/
 
