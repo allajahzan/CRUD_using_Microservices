@@ -52,13 +52,13 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@latest
 
-      - name: Wait for all pods to be ready
-        run: |
-          kubectl wait --for=condition=Ready pods --all --namespace=default --timeout=300s
-
       - name: Apply deployment.yaml files to Minikube Clustor
         run: |
           kubectl apply -f ./infra/k8s/dev/
+
+      - name: Wait for all pods to be ready
+        run: |
+          kubectl wait --for=condition=Ready pods --all --namespace=default --timeout=300s    
 
       - name: Verify deployment
         run: |
