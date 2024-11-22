@@ -89,7 +89,7 @@ docker-compose up --build
 
 <br>
 
-###
+<hr style="height: 2px; background-color: black; border: none;">
 
 <div align="center">
 <p>If you have any questions or need assistance, feel free to open an issue on GitHub.</p>
