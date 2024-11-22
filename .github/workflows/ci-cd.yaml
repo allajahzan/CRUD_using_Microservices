@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: ["nginx", "web", "auth", "user", "admin", "notification"]
+        service: ["admin", "auth", "nginx", "notification", "user", "web"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Log out of Docker 
+      - name: Logout From Docker
         run: docker logout
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -31,15 +31,14 @@ jobs:
           file: ./services/${{ matrix.service }}/Dockerfile
           push: true
           tags: |
-            allajahzan/crud-micro:nginx
-            allajahzan/crud-micro:web
-            allajahzan/crud-micro:auth
-            allajahzan/crud-micro:user
             allajahzan/crud-micro:admin
+            allajahzan/crud-micro:auth
+            allajahzan/crud-micro:nginx
             allajahzan/crud-micro:notification
+            allajahzan/crud-micro:user
+            allajahzan/crud-micro:web  
           build-args: |
             IMAGE_NAME=${{ matrix.service }}
-
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,11 +53,13 @@ jobs:
         with:
           version: "latest"
 
-      - name: Authenticate with Kubernetes
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: Build image
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          kubectl cluster-info
+          minikube image build -t local/devex:v1 .  
 
       - name: Apply Kubernetes Manifests
         run: |
@@ -66,4 +67,4 @@ jobs:
 
       - name: Verify deployment
         run: |
-          kubectl get pods   
+          kubectl get pods
