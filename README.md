@@ -91,6 +91,8 @@ docker-compose up --build
 
 ---
 
-If you have any questions or need assistance, feel free to open an issue on GitHub.
+<div align="center">
+<p>If you have any questions or need assistance, feel free to open an issue on GitHub.</p>
 
-🚀 Thank you!
+<p>🚀 Thank you!</p>
+</div>
