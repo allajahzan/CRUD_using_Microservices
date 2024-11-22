@@ -85,9 +85,7 @@ const amqpServer = 'amqp://rabbitmq:5672';
 docker-compose up --build
 ```
 
-5. Access the Application:
-
-Navigate to http://localhost in your browser to use the application. Nginx will route requests to the appropriate services.
+5. Access the Application: http://localhost:5173
 
 <br>
 
