@@ -13,7 +13,7 @@ services:
       - "80:80"
 
   web:
-    build: ../services/web
+    build: ./services/web
     container_name: crud_web
     env_file:
       - ./services/web/.env
