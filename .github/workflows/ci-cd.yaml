@@ -36,7 +36,7 @@ jobs:
             allajahzan/crud-micro:nginx
             allajahzan/crud-micro:notification
             allajahzan/crud-micro:user
-            allajahzan/crud-micro:web  
+            allajahzan/crud-micro:web
           build-args: |
             IMAGE_NAME=${{ matrix.service }}
 
@@ -52,6 +52,10 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@latest
 
+      - name: Wait for all pods to be ready
+        run: |
+          kubectl wait --for=condition=Ready pods --all --namespace=default --timeout=300s
+
       - name: Apply deployment.yaml files to Minikube Clustor
         run: |
           kubectl apply -f ./infra/k8s/dev/
@@ -60,11 +64,11 @@ jobs:
         run: |
           kubectl get pods
 
-      - name: Verify services
+      - name: Verify deployment
         run: |
           kubectl get services
 
       - name: Port forwarding for Web and Nginx
         run: |
-          kubectl port-forward service/web-srv 5173:5173
-          kubectl port-forward service/web-nginx 80:80   
+          nohup kubectl port-forward service/web-srv 5173:5173 &
+          nohup kubectl port-forward service/web-nginx 80:80 &
