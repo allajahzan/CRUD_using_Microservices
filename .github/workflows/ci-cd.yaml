@@ -55,8 +55,11 @@ jobs:
 
       - name: Set kubeconfig for Docker Desktop Kubernetes
         run: |
-          echo "$KUBE_CONFIG" > kubeconfig
-          export KUBE_CONFIG=kubeconfig
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG" > $HOME/.kube/config
+
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
       - name: Verify Kubernetes connection
         run: |
