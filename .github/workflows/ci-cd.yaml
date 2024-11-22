@@ -48,29 +48,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "latest"
+      - name: Start Minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
 
-      - name: Set kubeconfig for Docker Desktop Kubernetes
-        run: |
-          mkdir -p $HOME/.kube
-          echo "$KUBE_CONFIG" > $HOME/.kube/config
-
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-
-      - name: Verify Kubernetes connection
-        run: |
-          kubectl config current-context
-          kubectl get nodes    
-
-      - name: Apply Kubernetes manifests
+      - name: Apply deployment.yaml files to Minikube Clustor
         run: |
           kubectl apply -f ./infra/k8s/dev/
 
-      - name: Verify Deployment
+      - name: Wait for all pods to be ready
+        run: |
+          kubectl wait --for=condition=Ready pods --all --namespace=default --timeout=300s    
+
+      - name: Verify deployment
         run: |
           kubectl get pods
-          kubectl get services     
+
+      - name: Verify deployment
+        run: |
+          kubectl get services
+

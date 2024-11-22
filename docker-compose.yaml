@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   nginx:
-    image: allajahzan/crud-micro:nginx
+    build: ./services/nginx
     container_name: crud_nginx
     depends_on:
       - web
@@ -13,38 +13,38 @@ services:
       - "80:80"
 
   web:
-    image: allajahzan/crud-micro:web
+    build: ./services/web
     container_name: crud_web
     env_file:
-      - ../web/.env
+      - ./services/web/.env
     ports:
       - "5173:5173"
 
   auth:
-    image: allajahzan/crud-micro:auth
+    build: ./services/auth
     container_name: crud_auth
     env_file:
-      - ../services/auth/.env
+      - ./services/auth/.env
     depends_on:
       - rabbitmq
     ports:
       - "3000:80"
 
   user:
-    image: allajahzan/crud-micro:user
+    build: ./services/user
     container_name: crud_user
     env_file:
-      - ../services/user/.env
+      - ./services/user/.env
     depends_on:
       - rabbitmq
     ports:
       - "3001:80"
 
   admin:
-    image: allajahzan/crud-micro:admin
+    build: ./services/admin
     container_name: crud_admin
     env_file:
-      - ../services/admin/.env
+      - ./services/admin/.env
     depends_on:
       - rabbitmq
       - notification
@@ -52,16 +52,16 @@ services:
       - "3002:80"
 
   notification:
-    image: allajahzan/crud-micro:notification
+    build: ./services/notification
     container_name: crud_notification
     env_file:
-      - ../services/notification/.env
+      - ./services/notification/.env
     ports:
       - "3003:3003"
       - "50052:50052"
 
   rabbitmq:
-    image: allajahzan/crud-micro:rabbitmq
+    image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
       - "5672:5672"
