@@ -64,7 +64,3 @@ jobs:
         run: |
           kubectl get pods
 
-      - name: Verify deployment
-        run: |
-          kubectl get services
-
