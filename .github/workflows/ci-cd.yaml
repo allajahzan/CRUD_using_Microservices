@@ -48,27 +48,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Start Minikube
-        id: minikube
-        uses: medyagh/setup-minikube@latest
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
 
-      - name: Apply deployment.yaml files to Minikube Clustor
+      - name: Set kubeconfig for Docker Desktop Kubernetes
+        run: |
+          echo "$KUBE_CONFIG" > kubeconfig
+          export KUBE_CONFIG=kubeconfig
+
+      - name: Verify Kubernetes connection
+        run: |
+          kubectl config current-context
+          kubectl get nodes    
+
+      - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f ./infra/k8s/dev/
 
-      - name: Wait for all pods to be ready
-        run: |
-          kubectl wait --for=condition=Ready pods --all --namespace=default --timeout=300s    
-
-      - name: Verify deployment
+      - name: Verify Deployment
         run: |
           kubectl get pods
-
-      - name: Verify deployment
-        run: |
-          kubectl get services
-
-      - name: Port forwarding for Web and Nginx
-        run: |
-          nohup kubectl port-forward service/web-srv 5173:5173 &
-          nohup kubectl port-forward service/web-nginx 80:80 &
+          kubectl get services     
